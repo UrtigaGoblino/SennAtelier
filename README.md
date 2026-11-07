@@ -71,7 +71,7 @@ You only need to edit **one file**: `data/collections.js`.
 
 Then save and re-deploy (see below). No other file needs to change.
 
-> The data file contains **five Sennelier collections** — Oil Pastels (120), Oil Pastels Iridescent (10), Extra-Fine Oil Sticks (64), Soft Pastels "à l'écu" (499) and Iridescent Soft Pastels (25): **718 colours in total**. Colour names/numbers come from the official charts; the on-screen swatch colours are taken from retailer swatches (pontodasartes.com), so they're genuinely accurate.
+> The data file contains **six Sennelier collections** — Oil Pastels (120), Oil Pastels Iridescent (10), Extra-Fine Oil Sticks (64), Soft Pastels "à l'écu" (499), Iridescent Soft Pastels (25) and Special Sets (10 themed collector sets): **728 items in total**. Colour names/numbers come from the official charts; the on-screen swatch colours are taken from retailer swatches (pontodasartes.com), so they're genuinely accurate.
 
 ---
 
