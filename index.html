@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sennelier Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="brand-mark">🎨</span>
+        <div>
+          <h1>Sennelier Studio</h1>
+          <p class="tagline">A personal pastel collection &amp; art journal</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="export-btn" class="btn">⬇ Export backup</button>
+        <button id="import-btn" class="btn">⬆ Import backup</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden />
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="collection">🎨 Collection</button>
+    <button class="tab" data-tab="notes">📓 Notes</button>
+    <button class="tab" data-tab="journal">🖼️ Art Journal</button>
+    <button class="tab" data-tab="help">📖 Help</button>
+  </nav>
+
+  <main class="container">
+
+    <!-- ══════════ COLLECTION ══════════ -->
+    <section id="view-collection" class="view active">
+      <div id="collection-tabs" class="collection-tabs"></div>
+
+      <div class="collection-head">
+        <div>
+          <h2 id="collection-title"></h2>
+          <p id="collection-blurb" class="muted"></p>
+        </div>
+        <span id="collection-badge" class="badge" style="display:none">SAMPLE DATA</span>
+        <div id="collection-count" class="count"></div>
+      </div>
+
+      <div class="toolbar">
+        <input id="collection-search" class="search" type="search" placeholder="Search by name or number…" />
+        <select id="collection-filter" class="select">
+          <option value="all">All colours</option>
+          <option value="owned">I have these</option>
+          <option value="wishlist">Wishlist</option>
+          <option value="missing">I don't have these</option>
+        </select>
+      </div>
+
+      <div id="collection-grid" class="grid"></div>
+    </section>
+
+    <!-- ══════════ NOTES ══════════ -->
+    <section id="view-notes" class="view">
+      <div class="panel">
+        <textarea id="note-input" rows="3" placeholder="Write a note… (wishlist ideas, techniques, reminders)"></textarea>
+        <div class="panel-actions">
+          <button id="note-save" class="btn btn-primary">Add note</button>
+        </div>
+      </div>
+      <div id="notes-list"></div>
+    </section>
+
+    <!-- ══════════ ART JOURNAL ══════════ -->
+    <section id="view-journal" class="view">
+      <div class="panel panel-row">
+        <p class="muted">A little gallery of the art you've made.</p>
+        <button id="journal-add" class="btn btn-primary">＋ Add art</button>
+      </div>
+      <div id="journal-grid" class="journal-grid"></div>
+    </section>
+
+    <!-- ══════════ HELP ══════════ -->
+    <section id="view-help" class="view">
+      <div class="help-content">
+        <h2>How to use Sennelier Studio</h2>
+        <p><strong>Your data is private.</strong> Everything is saved only in <em>this browser</em>, on <em>this device</em>. Nothing is sent anywhere.</p>
+
+        <h3>🎨 Collection</h3>
+        <p>Tap a colour to mark it as <strong>owned</strong> (a ✓ appears). Tap the ☆ on a colour to add it to your <strong>wishlist</strong>. Use the search box and the filter to find colours. Switch between ranges (Oil Pastels, Soft Pastels…) using the buttons at the top of the Collection tab.</p>
+
+        <h3>📓 Notes</h3>
+        <p>Write anything — wishlist ideas, techniques, colour-mixing notes. Edit or delete notes whenever you like.</p>
+
+        <h3>🖼️ Art Journal</h3>
+        <p>Click <strong>＋ Add art</strong> to add a photo of a piece, plus a title, a date and an optional note. Your photos are stored in this browser.</p>
+
+        <h3>💾 Backups</h3>
+        <p>Click <strong>⬇ Export backup</strong> to download a file that saves <em>everything</em> (collection, notes and photos). Keep that file safe. On a new computer or browser, click <strong>⬆ Import backup</strong> and choose that file to restore it all.</p>
+        <p class="warn">⚠️ Clearing this site's data — or switching to a different device or browser — removes everything. So export a backup now and then, just like saving a file.</p>
+
+        <h3>🤖 Growing this app with ChatGPT</h3>
+        <p>This app is just a few files: <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, and <code>data/collections.js</code>. To add a new pastel range, add an entry to <code>data/collections.js</code>. The README explains the full structure.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ══════════ JOURNAL MODAL ══════════ -->
+  <div id="journal-modal" class="modal-backdrop">
+    <div class="modal">
+      <h2 id="journal-modal-title">Add art</h2>
+      <label class="field">
+        <span>Photo</span>
+        <input type="file" id="j-file" accept="image/*" />
+        <img id="j-preview" class="preview" alt="" />
+      </label>
+      <label class="field">
+        <span>Title</span>
+        <input type="text" id="j-title" placeholder="e.g. Sunset over the river" />
+      </label>
+      <label class="field">
+        <span>Date</span>
+        <input type="date" id="j-date" />
+      </label>
+      <label class="field">
+        <span>Note (optional)</span>
+        <textarea id="j-note" rows="3" placeholder="Anything you want to remember about this piece…"></textarea>
+      </label>
+      <div class="modal-actions">
+        <button id="j-cancel" class="btn">Cancel</button>
+        <button id="j-save" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <p>Made with 💛 for a very special artist. Your data stays on your device.</p>
+  </footer>
+
+  <script src="data/collections.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
