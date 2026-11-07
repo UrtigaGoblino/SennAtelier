@@ -178,27 +178,38 @@ body {
 }
 
 .swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: var(--card);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: border-color 0.15s, background 0.15s;
+}
+.swatch.owned { border-color: var(--green); background: #f3f8f0; }
+
+.swatch-main {
   position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 10px;
-  background: var(--card);
-  border: 2px solid transparent;
-  border-radius: var(--radius);
+  padding: 2px;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
   cursor: pointer;
   text-align: left;
-  box-shadow: var(--shadow);
-  transition: transform 0.1s, border-color 0.15s, background 0.15s;
-  font-family: inherit;
+  font: inherit;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
-.swatch:hover { transform: translateY(-2px); }
-.swatch.owned { border-color: var(--green); background: #f3f8f0; }
+.swatch-main:active { transform: scale(0.97); }
 
 .swatch-chip {
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.12);
   flex: 0 0 auto;
@@ -210,33 +221,51 @@ body {
 
 .swatch-owned {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: -2px;
+  right: 0;
   color: #fff;
   background: var(--green);
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  font-size: 0.72rem;
-  line-height: 18px;
+  font-size: 0.75rem;
+  line-height: 20px;
   text-align: center;
   display: none;
 }
 .swatch.owned .swatch-owned { display: block; }
 
-.swatch-star,
-.swatch-restock {
-  position: absolute;
-  bottom: 6px;
-  font-size: 1.05rem;
+.swatch-actions { display: flex; gap: 8px; }
+
+/* big, clear action buttons (favorite / rebuy) — mobile friendly */
+.act {
+  flex: 1;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  color: #c9b6ab;
+  font-size: 1.2rem;
+  line-height: 1;
   cursor: pointer;
-  color: #d8c9bf;
-  transition: color 0.15s;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
 }
-.swatch-star { right: 8px; }
-.swatch-restock { left: 8px; font-size: 0.95rem; }
-.swatch-star.on { color: var(--amber); }
-.swatch-restock.on { color: var(--accent); }
+.act:active { transform: scale(0.9); }
+.act-star.on { background: #fdf1cf; border-color: var(--amber); color: #b8860b; }
+.act-restock.on { background: var(--accent-tint); border-color: var(--accent); color: var(--accent-dark); }
+
+/* activation pop so it's obvious it worked */
+.pulse { animation: actPulse 0.45s ease; }
+@keyframes actPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
 
 .empty {
   color: var(--muted);
@@ -552,27 +581,38 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 
 .sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
 .set-card {
-  position: relative; display: flex; flex-direction: column; gap: 8px;
-  padding: 16px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
   background: linear-gradient(180deg, #fffdf7, #fff8ea);
   border: 2px solid #f0d9a8; border-radius: 16px;
-  cursor: pointer; text-align: left; font-family: inherit; color: inherit;
-  box-shadow: 0 4px 16px rgba(180, 140, 60, 0.12); transition: 0.15s;
+  box-shadow: 0 4px 16px rgba(180, 140, 60, 0.12);
+  transition: border-color 0.15s, transform 0.15s;
 }
 .set-card:hover { transform: translateY(-3px); border-color: #e0b860; }
 .set-card.owned { border-color: var(--green); background: linear-gradient(180deg, #f6fbf0, #eef7e6); }
+.set-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.set-main:active { transform: scale(0.98); }
 .set-top { display: flex; align-items: center; justify-content: space-between; }
 .set-dot { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4); }
 .set-check { color: var(--green); font-weight: 800; font-size: 1.15rem; opacity: 0; transition: opacity 0.15s; }
 .set-card.owned .set-check { opacity: 1; }
 .set-name { font-weight: 700; font-size: 1rem; line-height: 1.2; }
 .set-ref { font-size: 0.72rem; color: #a08a5a; font-weight: 600; }
-.set-actions { display: flex; gap: 10px; margin-top: 2px; }
-.set-star, .set-restock { cursor: pointer; color: #d8c9bf; transition: color 0.15s; }
-.set-star { font-size: 1.05rem; }
-.set-restock { font-size: 0.95rem; }
-.set-star.on { color: var(--amber); }
-.set-restock.on { color: var(--accent); }
+.set-actions { display: flex; gap: 8px; }
 
 .card-special { border: 2px solid #f0d9a8; background: linear-gradient(180deg, #fffdf7, #fff8ea); }
 .btn-special { background: linear-gradient(135deg, #f6d365, #f0b45a); color: #5a3d00; border-color: transparent; }

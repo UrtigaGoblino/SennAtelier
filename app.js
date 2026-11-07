@@ -388,34 +388,72 @@ function renderSwatch(coll, color) {
   var wish = isWishlisted(coll.id, color.code);
   var restock = isRestocked(coll.id, color.code);
 
-  var card = document.createElement("button");
+  var card = document.createElement("div");
   card.className = "swatch" + (owned ? " owned" : "");
-  card.type = "button";
-  card.title = color.name + (owned ? " (owned)" : "");
+  card.setAttribute("data-code", color.code);
 
-  card.innerHTML =
+  var main = document.createElement("button");
+  main.type = "button";
+  main.className = "swatch-main";
+  main.setAttribute("aria-pressed", owned ? "true" : "false");
+  main.title = color.name + (owned ? " (owned)" : "");
+  main.innerHTML =
     '<span class="swatch-chip" style="background:' + (color.hex || "#eee") + '"></span>' +
     '<span class="swatch-info">' +
       '<span class="swatch-code">' + escapeHtml(color.code || "—") + '</span>' +
       '<span class="swatch-name">' + escapeHtml(color.name) + '</span>' +
     '</span>' +
-    '<span class="swatch-owned">✓</span>' +
-    '<span class="swatch-restock' + (restock ? " on" : "") + '" title="Restock">🔁</span>' +
-    '<span class="swatch-star' + (wish ? " on" : "") + '" title="Wishlist">' + (wish ? "★" : "☆") + '</span>';
-
-  card.addEventListener("click", function (e) {
-    var t = e.target;
-    if (t && t.closest && t.closest(".swatch-star")) {
-      toggleWishlist(coll.id, color.code);
-    } else if (t && t.closest && t.closest(".swatch-restock")) {
-      toggleRestock(coll.id, color.code);
-    } else {
-      toggleOwned(coll.id, color.code);
-    }
+    '<span class="swatch-owned">✓</span>';
+  main.addEventListener("click", function () {
+    toggleOwned(coll.id, color.code);
     renderCollection();
+    pulseByCode(color.code, ".swatch-main");
   });
 
+  var actions = document.createElement("div");
+  actions.className = "swatch-actions";
+
+  var star = document.createElement("button");
+  star.type = "button";
+  star.className = "act act-star" + (wish ? " on" : "");
+  star.setAttribute("aria-pressed", wish ? "true" : "false");
+  star.title = "Favorite (wishlist)";
+  star.textContent = wish ? "★" : "☆";
+  star.addEventListener("click", function () {
+    toggleWishlist(coll.id, color.code);
+    renderCollection();
+    pulseByCode(color.code, ".act-star");
+  });
+
+  var rebuy = document.createElement("button");
+  rebuy.type = "button";
+  rebuy.className = "act act-restock" + (restock ? " on" : "");
+  rebuy.setAttribute("aria-pressed", restock ? "true" : "false");
+  rebuy.title = "Rebuy (restock)";
+  rebuy.textContent = "🔁";
+  rebuy.addEventListener("click", function () {
+    toggleRestock(coll.id, color.code);
+    renderCollection();
+    pulseByCode(color.code, ".act-restock");
+  });
+
+  actions.appendChild(star);
+  actions.appendChild(rebuy);
+  card.appendChild(main);
+  card.appendChild(actions);
   return card;
+}
+
+/* flash a card/button after a re-render so the change is obvious */
+function pulseByCode(code, sel) {
+  var cardEl = document.querySelector('.swatch[data-code="' + code + '"], .set-card[data-code="' + code + '"]');
+  if (!cardEl) { return; }
+  var target = sel ? cardEl.querySelector(sel) : cardEl;
+  if (!target) { target = cardEl; }
+  target.classList.remove("pulse");
+  void target.offsetWidth;
+  target.classList.add("pulse");
+  setTimeout(function () { target.classList.remove("pulse"); }, 500);
 }
 
 /* ── Palette rendering ─────────────────────────────────── */
@@ -468,24 +506,56 @@ function renderSetCard(coll, color) {
   var owned = isOwned(coll.id, color.code);
   var wish = isWishlisted(coll.id, color.code);
   var restock = isRestocked(coll.id, color.code);
-  var card = document.createElement("button");
-  card.type = "button";
+
+  var card = document.createElement("div");
   card.className = "set-card" + (owned ? " owned" : "");
-  card.innerHTML =
+  card.setAttribute("data-code", color.code);
+
+  var main = document.createElement("button");
+  main.type = "button";
+  main.className = "set-main";
+  main.setAttribute("aria-pressed", owned ? "true" : "false");
+  main.innerHTML =
     '<span class="set-top"><span class="set-dot" style="background:' + (color.hex || "#eee") + '"></span><span class="set-check">✓</span></span>' +
     '<span class="set-name">' + escapeHtml(color.name) + '</span>' +
-    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>' +
-    '<span class="set-actions">' +
-      '<span class="set-restock' + (restock ? " on" : "") + '" title="Rebuy (restock)">🔁</span>' +
-      '<span class="set-star' + (wish ? " on" : "") + '" title="Favorite (wishlist)">' + (wish ? "★" : "☆") + '</span>' +
-    '</span>';
-  card.addEventListener("click", function (e) {
-    var t = e.target;
-    if (t && t.closest && t.closest(".set-star")) { toggleWishlist(coll.id, color.code); }
-    else if (t && t.closest && t.closest(".set-restock")) { toggleRestock(coll.id, color.code); }
-    else { toggleOwned(coll.id, color.code); }
+    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>';
+  main.addEventListener("click", function () {
+    toggleOwned(coll.id, color.code);
     renderSetsView();
+    pulseByCode(color.code, ".set-main");
   });
+
+  var actions = document.createElement("div");
+  actions.className = "set-actions";
+
+  var star = document.createElement("button");
+  star.type = "button";
+  star.className = "act act-star" + (wish ? " on" : "");
+  star.setAttribute("aria-pressed", wish ? "true" : "false");
+  star.title = "Favorite (wishlist)";
+  star.textContent = wish ? "★" : "☆";
+  star.addEventListener("click", function () {
+    toggleWishlist(coll.id, color.code);
+    renderSetsView();
+    pulseByCode(color.code, ".act-star");
+  });
+
+  var rebuy = document.createElement("button");
+  rebuy.type = "button";
+  rebuy.className = "act act-restock" + (restock ? " on" : "");
+  rebuy.setAttribute("aria-pressed", restock ? "true" : "false");
+  rebuy.title = "Rebuy (restock)";
+  rebuy.textContent = "🔁";
+  rebuy.addEventListener("click", function () {
+    toggleRestock(coll.id, color.code);
+    renderSetsView();
+    pulseByCode(color.code, ".act-restock");
+  });
+
+  actions.appendChild(star);
+  actions.appendChild(rebuy);
+  card.appendChild(main);
+  card.appendChild(actions);
   return card;
 }
 
