@@ -452,25 +452,40 @@ function renderSetsView() {
   if (!grid) { return; }
   if (!coll) { grid.innerHTML = '<div class="empty">No special sets defined.</div>'; return; }
   var owned = ownedList(coll.id).length;
+  var wish = wishlistList(coll.id).length;
+  var restock = restockList(coll.id).length;
   var countEl = $("#sets-count");
-  if (countEl) { countEl.textContent = owned + " of " + coll.colors.length + " collected"; }
+  if (countEl) {
+    countEl.textContent = owned + " of " + coll.colors.length + " collected" +
+      (wish ? " · " + wish + " wishlist" : "") +
+      (restock ? " · " + restock + " restock" : "");
+  }
   grid.innerHTML = "";
   coll.colors.forEach(function (color) { grid.appendChild(renderSetCard(coll, color)); });
 }
 
 function renderSetCard(coll, color) {
   var owned = isOwned(coll.id, color.code);
+  var wish = isWishlisted(coll.id, color.code);
+  var restock = isRestocked(coll.id, color.code);
   var card = document.createElement("button");
   card.type = "button";
   card.className = "set-card" + (owned ? " owned" : "");
   card.innerHTML =
     '<span class="set-top"><span class="set-dot" style="background:' + (color.hex || "#eee") + '"></span><span class="set-check">✓</span></span>' +
     '<span class="set-name">' + escapeHtml(color.name) + '</span>' +
-    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>';
-  card.onclick = function () {
-    setOwnedState(coll.id, color.code, !isOwned(coll.id, color.code));
+    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>' +
+    '<span class="set-actions">' +
+      '<span class="set-restock' + (restock ? " on" : "") + '" title="Rebuy (restock)">🔁</span>' +
+      '<span class="set-star' + (wish ? " on" : "") + '" title="Favorite (wishlist)">' + (wish ? "★" : "☆") + '</span>' +
+    '</span>';
+  card.addEventListener("click", function (e) {
+    var t = e.target;
+    if (t && t.closest && t.closest(".set-star")) { toggleWishlist(coll.id, color.code); }
+    else if (t && t.closest && t.closest(".set-restock")) { toggleRestock(coll.id, color.code); }
+    else { toggleOwned(coll.id, color.code); }
     renderSetsView();
-  };
+  });
   return card;
 }
 

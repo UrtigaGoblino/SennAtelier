@@ -567,6 +567,12 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 .set-card.owned .set-check { opacity: 1; }
 .set-name { font-weight: 700; font-size: 1rem; line-height: 1.2; }
 .set-ref { font-size: 0.72rem; color: #a08a5a; font-weight: 600; }
+.set-actions { display: flex; gap: 10px; margin-top: 2px; }
+.set-star, .set-restock { cursor: pointer; color: #d8c9bf; transition: color 0.15s; }
+.set-star { font-size: 1.05rem; }
+.set-restock { font-size: 0.95rem; }
+.set-star.on { color: var(--amber); }
+.set-restock.on { color: var(--accent); }
 
 .card-special { border: 2px solid #f0d9a8; background: linear-gradient(180deg, #fffdf7, #fff8ea); }
 .btn-special { background: linear-gradient(135deg, #f6d365, #f0b45a); color: #5a3d00; border-color: transparent; }
