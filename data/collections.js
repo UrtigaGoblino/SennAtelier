@@ -1,42 +1,26 @@
 // ============================================================================
-//  SENNELIER STUDIO — PASTEL COLLECTION DATA
+//  ART STUDIO — COLLECTION DATA
 // ============================================================================
-//  This is the ONLY file you need to edit to add or change pastel collections.
-//  Each entry below is one "collection" (one Sennelier range).
+//  The ONLY file you need to edit to add/change collections.
 //
-//  ┌─────────────────────────────────────────────────────────────────────┐
-//  │  TEMPLATE — copy this to add a new collection:                      │
-//  │                                                                     │
-//  │  {                                                                  │
-//  │    id: "my-new-collection",        // lowercase, no spaces, unique  │
-//  │    name: "Extra Soft Pastels",     // shown in the app              │
-//  │    blurb: "The newer soft line.",  // short description (optional)  │
-//  │    colors: [                                                         │
-//  │      { code: "001", name: "White", hex: "#f6f5f1" },               │
-//  │      // ... one object per colour ...                                │
-//  │    ]                                                                │
-//  │  },                                                                 │
-//  └─────────────────────────────────────────────────────────────────────┘
+//  Each collection = { id, brand, name, blurb, colors }.
+//   * id     — UNIQUE short id (lowercase, no spaces). The app saves "owned"
+//              state per id, so two collections with the same id would share
+//              (and overwrite) the same saved data. Keep every id unique!
+//   * brand  — the maker, e.g. "Sennelier" or "Artist Gallery".
+//   * name   — the range name, e.g. "Oil Pastels".
+//   * colors — [{ code, name, hex }]. "code" = official colour number.
 //
-//  NOTES:
-//   * `code`  = the colour's official number (use a string, e.g. "001").
-//   * `name`  = the colour name.
-//   * `hex`   = an APPROXIMATE swatch colour shown in the app. These are
-//               only for on-screen preview and should be refined against
-//               the real sticks.
-//
-//  OFFICIAL SOURCES to check against:
-//   * Soft Pastels "à l'écu" (525 colours):
-//     https://www.sennelier-colors.com/article/photo/dossier512/Colourchart_Pastel_Ecu.pdf
-//   * Oil Pastels (120 colours):
-//     https://artistpigments.org/brands/sennelier-artist-oil-pastel
+//  To add a collection: copy an entry, give it a NEW unique id, fill in brand,
+//  name, blurb, and colors. That is all.
 // ============================================================================
 
 window.SENNELIER_COLLECTIONS = [
 
-  // ── Sennelier Oil Pastels ───────────────────────────────────────────────
+  // ── Sennelier · Oil Pastels ──
   {
     id: "oil-pastels",
+    brand: "Sennelier",
     name: "Oil Pastels",
     blurb: "The famous chunky sticks — 120 colours.",
     colors: [
@@ -163,9 +147,10 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
-  // ── Sennelier Oil Pastels — Iridescent ──────────────────────────────────
+  // ── Sennelier · Oil Pastels — Iridescent ──
   {
     id: "oil-pastels-iridescent",
+    brand: "Sennelier",
     name: "Oil Pastels — Iridescent",
     blurb: "Shimmery metallic oil pastels — 10 colours.",
     colors: [
@@ -182,9 +167,10 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
-  // ── Sennelier Extra-Fine Oil Sticks ─────────────────────────────────────
+  // ── Sennelier · Oil Sticks (Extra-Fine) ──
   {
     id: "oil-sticks",
+    brand: "Sennelier",
     name: "Oil Sticks (Extra-Fine)",
     blurb: "Oil paint in stick form — 64 colours.",
     colors: [
@@ -255,9 +241,10 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
-  // ── Sennelier Soft Pastels "à l'écu" ────────────────────────────────────
+  // ── Sennelier · Soft Pastels (à l'écu) ──
   {
     id: "soft-pastels",
+    brand: "Sennelier",
     name: "Soft Pastels (à l'écu)",
     blurb: "The classic half-stick range — 499 colours.",
     colors: [
@@ -763,9 +750,10 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
-  // ── Sennelier Soft Pastels "à l'écu" — Iridescent ───────────────────────
+  // ── Sennelier · Soft Pastels — Iridescent ──
   {
     id: "soft-pastels-iridescent",
+    brand: "Sennelier",
     name: "Soft Pastels — Iridescent",
     blurb: "Shimmery iridescent soft pastels — 25 colours.",
     colors: [
@@ -797,11 +785,10 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
-  // ── Sennelier Special Sets ──────────────────────────────────────────────
-  // Limited themed sets of 6 half-pastels (and the Claude Monet edition).
-  // Each set is one collectible; swatch colour is thematic.
+  // ── Sennelier · Special Sets ──
   {
     id: "special-sets",
+    brand: "Sennelier",
     name: "Special Sets",
     blurb: "Themed collector's sets of 6 half-pastels — collect them all!",
     colors: [
@@ -815,6 +802,136 @@ window.SENNELIER_COLLECTIONS = [
       { code: "112104129", name: "Summer Sky", hex: "#4FA3D9" },
       { code: "112104132", name: "Winter Mountains", hex: "#8FA3B0" },
       { code: "112104169", name: "Claude Monet Set", hex: "#7FA8B8" }
+    ]
+  },
+
+  // ── Artist Gallery · Oil Pastels ──
+  {
+    id: "artist-gallery-oil-pastels",
+    brand: "Artist Gallery",
+    name: "Oil Pastels",
+    blurb: "Artist-grade oil pastels — 120 colours.",
+    colors: [
+      { code: "201", name: "Lemon Yellow", hex: "#F9F055" },
+      { code: "202", name: "Yellow", hex: "#FEE309" },
+      { code: "203", name: "Orangish Yellow", hex: "#FBC664" },
+      { code: "204", name: "Golden Yellow", hex: "#F19E00" },
+      { code: "205", name: "Orange", hex: "#EE7E10" },
+      { code: "206", name: "Flame Red", hex: "#E95503" },
+      { code: "207", name: "Vermilion", hex: "#E62311" },
+      { code: "208", name: "Scarlet", hex: "#E1122B" },
+      { code: "209", name: "Carmine", hex: "#BD1221" },
+      { code: "210", name: "Purple", hex: "#A80F6C" },
+      { code: "211", name: "Lilac", hex: "#49245F" },
+      { code: "212", name: "Violet", hex: "#342366" },
+      { code: "213", name: "Periwinkle Blue", hex: "#5C529E" },
+      { code: "214", name: "Mauve", hex: "#9058A1" },
+      { code: "215", name: "Light Purple Violet", hex: "#B295C4" },
+      { code: "216", name: "Pink", hex: "#D87FAE" },
+      { code: "217", name: "Sky Blue", hex: "#7D94CC" },
+      { code: "218", name: "Ultramarine Blue", hex: "#12358E" },
+      { code: "219", name: "Prussian Blue", hex: "#123250" },
+      { code: "220", name: "Sapphire", hex: "#0E3264" },
+      { code: "221", name: "Cobalt Blue", hex: "#0B52A0" },
+      { code: "222", name: "Light Blue", hex: "#178ACC" },
+      { code: "223", name: "Turquoise Blue", hex: "#21B8DC" },
+      { code: "224", name: "Turquoise Green", hex: "#10B3A9" },
+      { code: "225", name: "Lime Green", hex: "#8AC880" },
+      { code: "226", name: "Jade Green", hex: "#00A981" },
+      { code: "227", name: "Yellow Green", hex: "#73BB49" },
+      { code: "228", name: "Grass Green", hex: "#008C45" },
+      { code: "229", name: "Emerald Green", hex: "#007046" },
+      { code: "230", name: "Dark Green", hex: "#003B24" },
+      { code: "231", name: "Malachite Green", hex: "#015F5A" },
+      { code: "232", name: "Moss Green", hex: "#5E6731" },
+      { code: "233", name: "Olive", hex: "#6B6133" },
+      { code: "234", name: "Olive Brown", hex: "#795B33" },
+      { code: "235", name: "Raw Umber", hex: "#462426" },
+      { code: "236", name: "Brown", hex: "#662F23" },
+      { code: "237", name: "Russet", hex: "#BD4522" },
+      { code: "238", name: "Ochre", hex: "#D0A24A" },
+      { code: "239", name: "Salmon Pink", hex: "#F29B75" },
+      { code: "240", name: "Salmon", hex: "#F6AE75" },
+      { code: "241", name: "Light Olive", hex: "#9DB61A" },
+      { code: "242", name: "Olive Yellow", hex: "#BCA711" },
+      { code: "243", name: "Pale Yellow", hex: "#FFF6B1" },
+      { code: "244", name: "White", hex: "#FFFFFF" },
+      { code: "245", name: "Light Grey", hex: "#B7CDD9" },
+      { code: "246", name: "Grey", hex: "#8FA1A0" },
+      { code: "247", name: "Dark Grey", hex: "#495B5A" },
+      { code: "248", name: "Black", hex: "#000000" },
+      { code: "249", name: "Silver Grey", hex: "#D0CDC8" },
+      { code: "250", name: "Pale Ochre", hex: "#E7B64D" },
+      { code: "251", name: "Dark Yellow", hex: "#F6AC1C" },
+      { code: "252", name: "Golden Ochre", hex: "#D57F1B" },
+      { code: "253", name: "Burnt Orange", hex: "#CA6423" },
+      { code: "254", name: "Grey Pink", hex: "#C99D99" },
+      { code: "255", name: "Light Mauve", hex: "#A594BA" },
+      { code: "256", name: "Deep Salmon", hex: "#EE7463" },
+      { code: "257", name: "Cold Pink", hex: "#DE197F" },
+      { code: "258", name: "Rose Pink", hex: "#D01158" },
+      { code: "259", name: "Deep Magenta", hex: "#D10340" },
+      { code: "260", name: "Cadmium Red", hex: "#E23D4C" },
+      { code: "261", name: "Azure Violet", hex: "#1A1F67" },
+      { code: "262", name: "Light Prussian Blue", hex: "#044377" },
+      { code: "263", name: "Medium Azure Violet", hex: "#3B62AE" },
+      { code: "264", name: "Light Azure Violet", hex: "#77A4D7" },
+      { code: "265", name: "Ice Blue", hex: "#A0D1F2" },
+      { code: "266", name: "Pale Green", hex: "#A5D18A" },
+      { code: "267", name: "Olive Light", hex: "#3E9734" },
+      { code: "268", name: "Light Emerald Green", hex: "#0C8F5F" },
+      { code: "269", name: "Light Moss Green", hex: "#1F622C" },
+      { code: "270", name: "Green Grey", hex: "#354545" },
+      { code: "271", name: "Verona Green", hex: "#284B3F" },
+      { code: "272", name: "Dark Cool Grey", hex: "#11364E" },
+      { code: "274", name: "Cream", hex: "#F9F8D8" },
+      { code: "275", name: "Vibrant Orange", hex: "#E94C09" },
+      { code: "276", name: "Jazzberry Jam", hex: "#CF0030" },
+      { code: "277", name: "Light Pink", hex: "#E8627E" },
+      { code: "279", name: "Millennial Pink", hex: "#F5B3BD" },
+      { code: "281", name: "Light Purple", hex: "#DD94BD" },
+      { code: "282", name: "Pastel Purple", hex: "#A2A6C4" },
+      { code: "283", name: "Royal Purple", hex: "#943D8B" },
+      { code: "284", name: "Purple Amethyst", hex: "#4B1E83" },
+      { code: "288", name: "Powder Lime Blue", hex: "#94D1C2" },
+      { code: "290", name: "Light Blue", hex: "#6AC1CD" },
+      { code: "291", name: "Light Ultramarine Blue", hex: "#3D9DD5" },
+      { code: "292", name: "Azura Blue", hex: "#006EBB" },
+      { code: "293", name: "Brandies Blue", hex: "#043792" },
+      { code: "294", name: "Catalina Blue", hex: "#1B2B73" },
+      { code: "295", name: "Bondi Blue", hex: "#0084B7" },
+      { code: "297", name: "Dark Turquoise", hex: "#016573" },
+      { code: "298", name: "Dark Sage", hex: "#4D744B" },
+      { code: "299", name: "Light Emerald Green", hex: "#007B4F" },
+      { code: "300", name: "Jade Green", hex: "#05A7B2" },
+      { code: "302", name: "Willow Green", hex: "#C6CE79" },
+      { code: "303", name: "Mint", hex: "#9AD2CE" },
+      { code: "304", name: "Lemon Green", hex: "#D4D642" },
+      { code: "305", name: "Chartreuse Green", hex: "#8CA421" },
+      { code: "306", name: "Dark Lemon Lime", hex: "#74AB42" },
+      { code: "307", name: "Cocoa Brown", hex: "#51313F" },
+      { code: "308", name: "Dark Sepia", hex: "#73413C" },
+      { code: "309", name: "Pastel Brown", hex: "#8C6540" },
+      { code: "310", name: "Caramel", hex: "#954627" },
+      { code: "312", name: "Champagne", hex: "#D9CC87" },
+      { code: "313", name: "Beige", hex: "#C9B573" },
+      { code: "315", name: "Rose Brown", hex: "#D28393" },
+      { code: "316", name: "Pastel Grey", hex: "#C0BCBD" },
+      { code: "318", name: "Cloud Grey", hex: "#AFB4B4" },
+      { code: "319", name: "Neutral Grey", hex: "#888985" },
+      { code: "320", name: "Charcoal Grey", hex: "#40454C" },
+      { code: "321", name: "Flue Yellow", hex: "#E5E645" },
+      { code: "322", name: "Flue Orange", hex: "#F18D5D" },
+      { code: "323", name: "Flue Red Pink", hex: "#EE798F" },
+      { code: "324", name: "Flue Pink", hex: "#EA88B4" },
+      { code: "325", name: "Flue Emerald Green", hex: "#87C137" },
+      { code: "326", name: "Flue Sky Blue", hex: "#7EC5E5" },
+      { code: "327", name: "Metallic White", hex: "#F5F1EF" },
+      { code: "328", name: "Metallic Yellow", hex: "#DEBA0F" },
+      { code: "329", name: "Light Gold", hex: "#D5AA1D" },
+      { code: "330", name: "Gold", hex: "#C7AF6D" },
+      { code: "331", name: "Metallic Salmon", hex: "#DAAF9E" },
+      { code: "332", name: "Silver", hex: "#D4CAC8" }
     ]
   }
 

@@ -319,17 +319,32 @@ function renderCollectionTabs() {
     var nav = $(sel);
     if (!nav) { return; }
     nav.innerHTML = "";
+    var groups = {}, order = [];
     colourCollections().forEach(function (coll) {
-      var btn = document.createElement("button");
-      btn.className = "coll-tab" + (coll.id === activeCollectionId ? " active" : "");
-      btn.textContent = coll.name;
-      btn.onclick = function () {
-        activeCollectionId = coll.id;
-        renderCollectionTabs();
-        renderCollection();
-        renderPalette();
-      };
-      nav.appendChild(btn);
+      var b = coll.brand || "Other";
+      if (!groups[b]) { groups[b] = []; order.push(b); }
+      groups[b].push(coll);
+    });
+    order.forEach(function (brand) {
+      var label = document.createElement("div");
+      label.className = "coll-group";
+      label.textContent = brand;
+      nav.appendChild(label);
+      var row = document.createElement("div");
+      row.className = "coll-group-row";
+      groups[brand].forEach(function (coll) {
+        var btn = document.createElement("button");
+        btn.className = "coll-tab" + (coll.id === activeCollectionId ? " active" : "");
+        btn.textContent = coll.name;
+        btn.onclick = function () {
+          activeCollectionId = coll.id;
+          renderCollectionTabs();
+          renderCollection();
+          renderPalette();
+        };
+        row.appendChild(btn);
+      });
+      nav.appendChild(row);
     });
   });
 }
@@ -342,6 +357,8 @@ function renderCollection() {
   }
   activeCollectionId = coll.id;
 
+  var brandEl = $("#collection-brand");
+  if (brandEl) { brandEl.textContent = coll.brand || ""; }
   $("#collection-title").textContent = coll.name;
   $("#collection-blurb").textContent = coll.blurb || "";
   $("#collection-badge").style.display = coll.sample ? "inline-block" : "none";
@@ -650,6 +667,7 @@ function renderHome() {
       '<div class="coll-card">' +
         ringHTML(pct, 60) +
         '<div>' +
+          '<div class="cc-brand">' + escapeHtml(c.brand || "") + '</div>' +
           '<div class="cc-name">' + escapeHtml(c.name) + '</div>' +
           '<div class="cc-sub">' + owned + ' / ' + total + ' · ' + pct + '%</div>' +
         '</div>' +
@@ -960,7 +978,7 @@ function importData(file) {
     catch (e) { alert("That file isn't a valid backup."); return; }
 
     if (!payload || payload.app !== "sennelier-studio") {
-      alert("This doesn't look like a Sennelier Studio backup.");
+      alert("This doesn't look like an Art Studio backup.");
       return;
     }
     if (!confirm("Import will REPLACE your current data. Continue?")) { return; }

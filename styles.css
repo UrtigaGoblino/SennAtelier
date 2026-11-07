@@ -116,7 +116,10 @@ body {
 .card h3 { margin: 0 0 12px; font-size: 1rem; }
 
 /* ── Collection tabs (range switcher) ───────────────────── */
-.collection-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 4px 0 14px; }
+.collection-tabs { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 14px; }
+.coll-group { font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-top: 2px; }
+.coll-group-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.coll-brand { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--accent); }
 .coll-tab {
   border: 1px solid var(--line);
   background: var(--card);
@@ -353,6 +356,7 @@ body {
 }
 .coll-card:hover { border-color: var(--accent-tint); background: #fff; }
 .coll-card .cc-name { font-weight: 700; }
+.coll-card .cc-brand { font-size: 0.66rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); }
 .coll-card .cc-sub { font-size: 0.78rem; color: var(--muted); }
 
 .home-shopping-btn { margin-top: 4px; }
