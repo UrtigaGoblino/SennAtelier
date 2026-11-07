@@ -71,7 +71,7 @@ You only need to edit **one file**: `data/collections.js`.
 
 Then save and re-deploy (see below). No other file needs to change.
 
-> The current data file contains a real (partial) list of **Sennelier Oil Pastels** from [artistpigments.org](https://artistpigments.org/brands/sennelier-artist-oil-pastel), and a clearly-marked **sample** for the Soft Pastels. Fill in the full 525-colour Soft Pastels list from [Sennelier's official PDF colour chart](https://www.sennelier-colors.com/article/photo/dossier512/Colourchart_Pastel_Ecu.pdf).
+> The current data file contains the full **120-colour Sennelier Oil Pastels** range, and a **best-effort 456 of 525 colours** for the Soft Pastels "à l'écu" (extracted from the official PDF charts). Swatch hex colours are approximate — refine them later with measured data (e.g. Paul Centore's pastel spectrophotometer research).
 
 ---
 

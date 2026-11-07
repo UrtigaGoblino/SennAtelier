@@ -453,7 +453,7 @@ function renderShopping() {
   list.innerHTML = "";
 
   if (items.length === 0) {
-    list.innerHTML = '<div class="empty">Nothing here yet. In the Collection tab, tap ☆ to wishlist or 🔁 to flag a restock.</div>';
+    list.innerHTML = '<div class="empty">Your shopping list is empty.<br>In the <strong>Collection</strong> tab, tap <strong>☆</strong> to wishlist a colour, or <strong>🔁</strong> to flag one for restock — they will show up here.</div>';
     return;
   }
 
