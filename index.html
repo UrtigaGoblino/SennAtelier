@@ -28,6 +28,7 @@
     <button class="tab active" data-tab="home">🏠 Home</button>
     <button class="tab" data-tab="collection">🎨 Collection</button>
     <button class="tab" data-tab="palette">🌈 Palette</button>
+    <button class="tab tab-special" data-tab="sets">✨ Sets</button>
     <button class="tab" data-tab="shopping">🛍️ Shopping</button>
     <button class="tab" data-tab="stats">📊 Stats</button>
     <button class="tab" data-tab="notes">📓 Notes</button>
@@ -47,6 +48,7 @@
         <h3>Your collections</h3>
         <div id="home-collections" class="home-collections"></div>
       </div>
+      <div class="card card-special" id="home-special"></div>
       <div class="card" id="home-shopping"></div>
     </section>
 
@@ -86,6 +88,17 @@
       </div>
       <p class="muted">Your owned colours, laid out in rainbow order — like opening your pastel box.</p>
       <div id="palette-box" class="palette-grid"></div>
+    </section>
+
+    <!-- ══════════ SPECIAL SETS ══════════ -->
+    <section id="view-sets" class="view">
+      <div class="sets-hero">
+        <h2>✨ Special Sets</h2>
+        <span class="special-badge">Collectible</span>
+        <div id="sets-count" class="count"></div>
+      </div>
+      <p class="muted">Limited themed sets of 6 half-pastels — the special ones. Tap a set to mark it owned.</p>
+      <div id="sets-grid" class="sets-grid"></div>
     </section>
 
     <!-- ══════════ SHOPPING ══════════ -->

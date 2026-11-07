@@ -501,6 +501,44 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 /* ── Footer ─────────────────────────────────────────────── */
 .site-footer { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 24px 16px; }
 
+/* ── Special Sets ───────────────────────────────────────── */
+.tab-special { color: #b8860b; }
+.tab-special:hover { background: rgba(255, 240, 200, 0.6); color: #8a5a00; }
+.tab-special.active { color: #7a4d00; background: linear-gradient(135deg, #fff6dd, #ffe9b0); }
+
+.sets-hero { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 4px 0 10px; }
+.sets-hero h2 { margin: 0; }
+.special-badge {
+  background: linear-gradient(135deg, #f6d365, #fda085);
+  color: #5a3d00; font-size: 0.72rem; font-weight: 800;
+  padding: 3px 10px; border-radius: 999px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.special-head { display: flex; align-items: center; gap: 10px; }
+.special-head h3 { margin: 0; }
+
+.sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.set-card {
+  position: relative; display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 14px 14px;
+  background: linear-gradient(180deg, #fffdf7, #fff8ea);
+  border: 2px solid #f0d9a8; border-radius: 16px;
+  cursor: pointer; text-align: left; font-family: inherit; color: inherit;
+  box-shadow: 0 4px 16px rgba(180, 140, 60, 0.12); transition: 0.15s;
+}
+.set-card:hover { transform: translateY(-3px); border-color: #e0b860; }
+.set-card.owned { border-color: var(--green); background: linear-gradient(180deg, #f6fbf0, #eef7e6); }
+.set-top { display: flex; align-items: center; justify-content: space-between; }
+.set-dot { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(0, 0, 0, 0.12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4); }
+.set-check { color: var(--green); font-weight: 800; font-size: 1.15rem; opacity: 0; transition: opacity 0.15s; }
+.set-card.owned .set-check { opacity: 1; }
+.set-name { font-weight: 700; font-size: 1rem; line-height: 1.2; }
+.set-ref { font-size: 0.72rem; color: #a08a5a; font-weight: 600; }
+
+.card-special { border: 2px solid #f0d9a8; background: linear-gradient(180deg, #fffdf7, #fff8ea); }
+.btn-special { background: linear-gradient(135deg, #f6d365, #f0b45a); color: #5a3d00; border-color: transparent; }
+.btn-special:hover { background: linear-gradient(135deg, #f3cc4f, #e8a94a); }
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 640px) {
   .home-grid { grid-template-columns: 1fr; }

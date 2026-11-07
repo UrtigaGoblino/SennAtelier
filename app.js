@@ -437,6 +437,35 @@ function renderPalette() {
   });
 }
 
+/* ── Special Sets rendering ────────────────────────────── */
+function renderSetsView() {
+  var coll = getCollectionById("special-sets");
+  var grid = $("#sets-grid");
+  if (!grid) { return; }
+  if (!coll) { grid.innerHTML = '<div class="empty">No special sets defined.</div>'; return; }
+  var owned = ownedList(coll.id).length;
+  var countEl = $("#sets-count");
+  if (countEl) { countEl.textContent = owned + " of " + coll.colors.length + " collected"; }
+  grid.innerHTML = "";
+  coll.colors.forEach(function (color) { grid.appendChild(renderSetCard(coll, color)); });
+}
+
+function renderSetCard(coll, color) {
+  var owned = isOwned(coll.id, color.code);
+  var card = document.createElement("button");
+  card.type = "button";
+  card.className = "set-card" + (owned ? " owned" : "");
+  card.innerHTML =
+    '<span class="set-top"><span class="set-dot" style="background:' + (color.hex || "#eee") + '"></span><span class="set-check">✓</span></span>' +
+    '<span class="set-name">' + escapeHtml(color.name) + '</span>' +
+    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>';
+  card.onclick = function () {
+    setOwnedState(coll.id, color.code, !isOwned(coll.id, color.code));
+    renderSetsView();
+  };
+  return card;
+}
+
 /* ── Shopping list rendering ───────────────────────────── */
 function renderShopping() {
   var list = $("#shopping-list");
@@ -539,6 +568,17 @@ function renderHome() {
   $("#home-shopping").innerHTML = shop > 0
     ? '<h3>🛍️ Shopping</h3><p class="muted">You have <strong>' + shop + '</strong> item' + (shop === 1 ? "" : "s") + ' on your list.</p><button class="btn btn-primary home-shopping-btn" data-goto="shopping">Open shopping list →</button>'
     : '<h3>🛍️ Shopping</h3><p class="muted">Your shopping list is empty.</p>';
+
+  var setsColl = getCollectionById("special-sets");
+  if (setsColl && $("#home-special")) {
+    var setsOwned = ownedList("special-sets").length;
+    $("#home-special").innerHTML =
+      '<div class="special-head"><h3>✨ Special Sets</h3><span class="special-badge">Collectible</span></div>' +
+      '<p class="muted">Themed sets of 6 half-pastels — <strong>' + setsOwned + ' of ' + setsColl.colors.length + '</strong> collected.</p>' +
+      '<button class="btn btn-special" data-goto="sets">Open Special Sets →</button>';
+    var gotoSpecial = $("#home-special").querySelector("[data-goto]");
+    if (gotoSpecial) { gotoSpecial.onclick = function () { switchTab("sets"); }; }
+  }
 
   var goto = $("#home-shopping").querySelector("[data-goto]");
   if (goto) { goto.onclick = function () { switchTab("shopping"); }; }
@@ -861,6 +901,7 @@ function switchTab(tabId) {
   if (tabId === "home") { renderHome(); }
   if (tabId === "collection") { renderCollection(); }
   if (tabId === "palette") { renderCollectionTabs(); renderPalette(); }
+  if (tabId === "sets") { renderSetsView(); }
   if (tabId === "shopping") { renderShopping(); }
   if (tabId === "stats") { renderStats(); }
   if (tabId === "notes") { renderNotes(); }
@@ -873,6 +914,7 @@ function refreshAll() {
     renderHome();
     renderCollection();
     renderPalette();
+    renderSetsView();
     renderShopping();
     renderStats();
     renderNotes();
