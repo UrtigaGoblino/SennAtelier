@@ -44,6 +44,14 @@ function getCollectionById(id) {
   return (window.SENNELIER_COLLECTIONS || []).filter(function (c) { return c.id === id; })[0] || null;
 }
 
+/* The "Special Sets" collection holds collectible sets, not individual colours,
+   so colour/stick stats and the Collection/Palette switchers skip it. */
+var SETS_ID = "special-sets";
+function isColourCollection(c) { return !!c && c.id !== SETS_ID; }
+function colourCollections() {
+  return (window.SENNELIER_COLLECTIONS || []).filter(isColourCollection);
+}
+
 function currentCollection() {
   var cols = window.SENNELIER_COLLECTIONS || [];
   return getCollectionById(activeCollectionId) || cols[0] || null;
@@ -285,7 +293,7 @@ function ringHTML(pct, size) {
 /* ── Aggregates ────────────────────────────────────────── */
 function totalCounts() {
   var totalColors = 0, totalOwned = 0, totalWish = 0, totalRestock = 0;
-  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+  colourCollections().forEach(function (c) {
     totalColors += (c.colors || []).length;
     totalOwned += ownedList(c.id).length;
     totalWish += wishlistList(c.id).length;
@@ -296,7 +304,7 @@ function totalCounts() {
 
 function ownedColorsAcrossAll() {
   var result = [];
-  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+  colourCollections().forEach(function (c) {
     ownedList(c.id).forEach(function (code) {
       var color = (c.colors || []).filter(function (x) { return x.code === code; })[0];
       if (color) { result.push({ collection: c, color: color }); }
@@ -311,7 +319,7 @@ function renderCollectionTabs() {
     var nav = $(sel);
     if (!nav) { return; }
     nav.innerHTML = "";
-    (window.SENNELIER_COLLECTIONS || []).forEach(function (coll) {
+    colourCollections().forEach(function (coll) {
       var btn = document.createElement("button");
       btn.className = "coll-tab" + (coll.id === activeCollectionId ? " active" : "");
       btn.textContent = coll.name;
@@ -549,7 +557,7 @@ function renderHome() {
     '</div>';
 
   var colsHTML = "";
-  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+  colourCollections().forEach(function (c) {
     var owned = ownedList(c.id).length;
     var total = (c.colors || []).length;
     var pct = total ? Math.round((owned / total) * 100) : 0;
@@ -593,6 +601,10 @@ function renderStats() {
   var t = totalCounts();
   var overallPct = t.colors ? Math.round((t.owned / t.colors) * 100) : 0;
 
+  var setsColl = getCollectionById(SETS_ID);
+  var setsOwned = ownedList(SETS_ID).length;
+  var setsTotal = setsColl ? (setsColl.colors || []).length : 0;
+
   $("#stats-overview").innerHTML =
     '<div class="stats-overview">' +
       '<div class="ov"><div class="num">' + t.owned + '</div><div class="lbl">sticks owned</div></div>' +
@@ -600,6 +612,7 @@ function renderStats() {
       '<div class="ov"><div class="num">' + overallPct + '%</div><div class="lbl">overall collected</div></div>' +
       '<div class="ov"><div class="num">' + t.wish + '</div><div class="lbl">wishlist</div></div>' +
       '<div class="ov"><div class="num">' + t.restock + '</div><div class="lbl">to restock</div></div>' +
+      '<div class="ov"><div class="num">' + setsOwned + ' / ' + setsTotal + '</div><div class="lbl">special sets</div></div>' +
     '</div>';
 
   var families = {};
@@ -951,7 +964,7 @@ function bindEvents() {
 /* ── Init ──────────────────────────────────────────────── */
 function init() {
   loadState();
-  var cols = window.SENNELIER_COLLECTIONS || [];
+  var cols = colourCollections();
   activeCollectionId = cols[0] ? cols[0].id : null;
   bindEvents();
   refreshAll();

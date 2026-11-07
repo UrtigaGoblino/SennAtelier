@@ -75,9 +75,9 @@ Then save and re-deploy (see below). No other file needs to change.
 
 ---
 
-## 🤖 Growing the app with ChatGPT
+## 🤖 Growing the app with your favorite AI
 
-This project is deliberately simple so an AI assistant (like ChatGPT) can help you change it. Good prompts to try:
+This project is deliberately simple so **any** AI assistant — ChatGPT, Claude, Gemini, Copilot, whatever you use — can help you change it. **Send this README to your AI** and describe what you want. Good prompts to try:
 
 - *"Add a `deleteAll` / clear button to the Collection tab."*
 - *"Let me reorder notes by dragging them."*
