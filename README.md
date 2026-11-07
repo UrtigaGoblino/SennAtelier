@@ -10,9 +10,13 @@ Everything runs in the browser. **Your data never leaves your device** — it's 
 
 | Tab | What it's for |
 | --- | --- |
-| 🎨 **Collection** | See each pastel range (Oil Pastels, Soft Pastels…) as a grid of colours. **Tap a colour** to mark it as *owned* (a ✓ appears). **Tap the ☆** to add it to your *wishlist*. Search and filter to find things fast. |
-| 📓 **Notes** | A simple notebook. Write wishlist ideas, techniques, colour-mixing notes — anything. Edit or delete any time. |
-| 🖼️ **Art Journal** | Add a **photo** of your art, plus a **title**, **date**, and an optional **note**. Your photos are saved in this browser. |
+| 🏠 **Home** | Your dashboard — progress rings, stick counter, and a quick glance at each collection. |
+| 🎨 **Collection** | Each pastel range as a grid of colours. **Tap a colour** to mark it *owned* (✓). Tap **☆** for your *wishlist*, and **🔁** to flag something for *restock*. Search and filter to find things fast. |
+| 🌈 **Palette** | Your *owned* colours laid out in rainbow order — like opening your actual pastel box. |
+| 🛍️ **Shopping** | Your wishlist + restock list in one place, ready for the art shop. |
+| 📊 **Stats** | Totals, per-collection progress, and your favourite colour families. |
+| 📓 **Notes** | A simple notebook. Write wishlist ideas, techniques, colour-mixing notes — anything. |
+| 🖼️ **Art Journal** | Add a **photo** of your art, plus a **title**, **date**, and an optional **note**. |
 | 📖 **Help** | Quick in-app instructions. |
 
 ---

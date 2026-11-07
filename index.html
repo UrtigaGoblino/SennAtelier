@@ -17,24 +17,41 @@
         </div>
       </div>
       <div class="header-actions">
-        <button id="export-btn" class="btn">⬇ Export backup</button>
-        <button id="import-btn" class="btn">⬆ Import backup</button>
+        <button id="export-btn" class="btn">⬇ Export</button>
+        <button id="import-btn" class="btn">⬆ Import</button>
         <input type="file" id="import-file" accept="application/json,.json" hidden />
       </div>
     </div>
   </header>
 
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="collection">🎨 Collection</button>
+    <button class="tab active" data-tab="home">🏠 Home</button>
+    <button class="tab" data-tab="collection">🎨 Collection</button>
+    <button class="tab" data-tab="palette">🌈 Palette</button>
+    <button class="tab" data-tab="shopping">🛍️ Shopping</button>
+    <button class="tab" data-tab="stats">📊 Stats</button>
     <button class="tab" data-tab="notes">📓 Notes</button>
-    <button class="tab" data-tab="journal">🖼️ Art Journal</button>
+    <button class="tab" data-tab="journal">🖼️ Journal</button>
     <button class="tab" data-tab="help">📖 Help</button>
   </nav>
 
   <main class="container">
 
+    <!-- ══════════ HOME (dashboard) ══════════ -->
+    <section id="view-home" class="view active">
+      <div class="home-grid">
+        <div class="card card-hero" id="home-hero"></div>
+        <div class="card" id="home-stats"></div>
+      </div>
+      <div class="card">
+        <h3>Your collections</h3>
+        <div id="home-collections" class="home-collections"></div>
+      </div>
+      <div class="card" id="home-shopping"></div>
+    </section>
+
     <!-- ══════════ COLLECTION ══════════ -->
-    <section id="view-collection" class="view active">
+    <section id="view-collection" class="view">
       <div id="collection-tabs" class="collection-tabs"></div>
 
       <div class="collection-head">
@@ -52,11 +69,42 @@
           <option value="all">All colours</option>
           <option value="owned">I have these</option>
           <option value="wishlist">Wishlist</option>
+          <option value="restock">Need to restock</option>
           <option value="missing">I don't have these</option>
         </select>
       </div>
 
       <div id="collection-grid" class="grid"></div>
+    </section>
+
+    <!-- ══════════ PALETTE ══════════ -->
+    <section id="view-palette" class="view">
+      <div id="palette-tabs" class="collection-tabs"></div>
+      <div class="collection-head">
+        <h2>My Palette</h2>
+        <div id="palette-count" class="count"></div>
+      </div>
+      <p class="muted">Your owned colours, laid out in rainbow order — like opening your pastel box.</p>
+      <div id="palette-box" class="palette-grid"></div>
+    </section>
+
+    <!-- ══════════ SHOPPING ══════════ -->
+    <section id="view-shopping" class="view">
+      <div class="collection-head">
+        <h2>Shopping List</h2>
+        <div id="shopping-count" class="count"></div>
+      </div>
+      <p class="muted">Your ☆ wishlist and 🔁 restock list in one place — handy for the art shop.</p>
+      <div id="shopping-list"></div>
+    </section>
+
+    <!-- ══════════ STATS ══════════ -->
+    <section id="view-stats" class="view">
+      <div class="card" id="stats-overview"></div>
+      <div class="card">
+        <h3>Colour families you collect</h3>
+        <div id="stats-families"></div>
+      </div>
     </section>
 
     <!-- ══════════ NOTES ══════════ -->
@@ -85,21 +133,30 @@
         <h2>How to use Sennelier Studio</h2>
         <p><strong>Your data is private.</strong> Everything is saved only in <em>this browser</em>, on <em>this device</em>. Nothing is sent anywhere.</p>
 
+        <h3>🏠 Home</h3>
+        <p>Your dashboard: progress rings, your stick count, and a quick look at each collection.</p>
+
         <h3>🎨 Collection</h3>
-        <p>Tap a colour to mark it as <strong>owned</strong> (a ✓ appears). Tap the ☆ on a colour to add it to your <strong>wishlist</strong>. Use the search box and the filter to find colours. Switch between ranges (Oil Pastels, Soft Pastels…) using the buttons at the top of the Collection tab.</p>
+        <p><strong>Tap a colour</strong> to mark it <strong>owned</strong> (✓). Tap the <strong>☆</strong> to add it to your <strong>wishlist</strong>, and the <strong>🔁</strong> to flag something you need to <strong>restock</strong>. Use search and the filter to find colours.</p>
 
-        <h3>📓 Notes</h3>
-        <p>Write anything — wishlist ideas, techniques, colour-mixing notes. Edit or delete notes whenever you like.</p>
+        <h3>🌈 Palette</h3>
+        <p>Your owned colours in rainbow order — a beautiful view of your collection.</p>
 
-        <h3>🖼️ Art Journal</h3>
-        <p>Click <strong>＋ Add art</strong> to add a photo of a piece, plus a title, a date and an optional note. Your photos are stored in this browser.</p>
+        <h3>🛍️ Shopping</h3>
+        <p>Your wishlist + restock list together, ready to take to the art shop. Tap <strong>✓ Got it</strong> when you've bought or restocked something.</p>
+
+        <h3>📊 Stats</h3>
+        <p>Totals, progress per collection, and your favourite colour families.</p>
+
+        <h3>📓 Notes &amp; 🖼️ Journal</h3>
+        <p>Write notes, or add photos of your art with a title, date and note.</p>
 
         <h3>💾 Backups</h3>
-        <p>Click <strong>⬇ Export backup</strong> to download a file that saves <em>everything</em> (collection, notes and photos). Keep that file safe. On a new computer or browser, click <strong>⬆ Import backup</strong> and choose that file to restore it all.</p>
-        <p class="warn">⚠️ Clearing this site's data — or switching to a different device or browser — removes everything. So export a backup now and then, just like saving a file.</p>
+        <p>Click <strong>⬇ Export</strong> to download one file that saves <em>everything</em>. On a new computer or browser, click <strong>⬆ Import</strong> and choose that file.</p>
+        <p class="warn">⚠️ Clearing this site's data — or switching device/browser — removes everything. Export a backup now and then.</p>
 
         <h3>🤖 Growing this app with ChatGPT</h3>
-        <p>This app is just a few files: <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, and <code>data/collections.js</code>. To add a new pastel range, add an entry to <code>data/collections.js</code>. The README explains the full structure.</p>
+        <p>This app is just a few files: <code>index.html</code>, <code>styles.css</code>, <code>app.js</code>, and <code>data/collections.js</code>. To add a pastel range, edit <code>data/collections.js</code>. See the README for details.</p>
       </div>
     </section>
 
@@ -132,6 +189,9 @@
       </div>
     </div>
   </div>
+
+  <!-- ══════════ TOASTS ══════════ -->
+  <div id="toasts" class="toasts"></div>
 
   <footer class="site-footer">
     <p>Made with 💛 for a very special artist. Your data stays on your device.</p>

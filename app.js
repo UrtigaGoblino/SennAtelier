@@ -1,8 +1,8 @@
 /* ============================================================
    SENNELIER STUDIO — app logic
-   - Collection / Notes state  -> localStorage (tiny)
-   - Art journal (photos)      -> IndexedDB  (big)
-   - Export / Import           -> one JSON backup file
+   - Collection / Notes state      -> localStorage (tiny)
+   - Art journal (photos)          -> IndexedDB  (big)
+   - Export / Import               -> one JSON backup file
    ============================================================ */
 
 "use strict";
@@ -12,19 +12,22 @@ var LS_KEY = "sennelier-studio:v1";
 var DB_NAME = "sennelier-studio";
 var DB_STORE = "journal";
 var DB_VERSION = 1;
+var MILESTONES = [25, 50, 75, 100];
 
 /* ── State ─────────────────────────────────────────────── */
 var state = {
   owned: {},     // { collectionId: [code, ...] }
   wishlist: {},  // { collectionId: [code, ...] }
+  restock: {},   // { collectionId: [code, ...] }
   notes: []      // [{ id, text, createdAt, updatedAt }]
 };
 
-var journal = []; // loaded from IndexedDB: [{ id, title, date, note, imageDataUrl, createdAt }]
+var journal = []; // from IndexedDB: [{ id, title, date, note, imageDataUrl, createdAt }]
 var activeCollectionId = null;
 var editingNoteId = null;
 var editingJournalId = null;
 var pendingImageDataUrl = null;
+var celebrated = {}; // session milestone dedupe: "collId:tier" -> true
 
 /* ── Small helpers ─────────────────────────────────────── */
 function $(sel) { return document.querySelector(sel); }
@@ -37,6 +40,15 @@ function escapeHtml(s) {
   });
 }
 
+function getCollectionById(id) {
+  return (window.SENNELIER_COLLECTIONS || []).filter(function (c) { return c.id === id; })[0] || null;
+}
+
+function currentCollection() {
+  var cols = window.SENNELIER_COLLECTIONS || [];
+  return getCollectionById(activeCollectionId) || cols[0] || null;
+}
+
 /* ── localStorage (collection + notes) ─────────────────── */
 function loadState() {
   try {
@@ -45,6 +57,7 @@ function loadState() {
       var parsed = JSON.parse(raw);
       state.owned = parsed.owned || {};
       state.wishlist = parsed.wishlist || {};
+      state.restock = parsed.restock || {};
       state.notes = parsed.notes || [];
     }
   } catch (e) {
@@ -57,6 +70,7 @@ function saveState() {
     localStorage.setItem(LS_KEY, JSON.stringify({
       owned: state.owned,
       wishlist: state.wishlist,
+      restock: state.restock,
       notes: state.notes
     }));
   } catch (e) {
@@ -125,47 +139,190 @@ function idbClear() {
   });
 }
 
-/* ── Collection helpers ────────────────────────────────── */
+/* ── Collection state helpers ──────────────────────────── */
 function ownedList(collId) { return state.owned[collId] || []; }
 function wishlistList(collId) { return state.wishlist[collId] || []; }
+function restockList(collId) { return state.restock[collId] || []; }
 function isOwned(collId, code) { return ownedList(collId).indexOf(code) !== -1; }
 function isWishlisted(collId, code) { return wishlistList(collId).indexOf(code) !== -1; }
+function isRestocked(collId, code) { return restockList(collId).indexOf(code) !== -1; }
 
-function toggleOwned(collId, code) {
+function setOwnedState(collId, code, owned) {
   var list = ownedList(collId);
-  var i = list.indexOf(code);
-  if (i !== -1) { list.splice(i, 1); } else { list.push(code); }
-  state.owned[collId] = list;
+  var idx = list.indexOf(code);
+  if (owned && idx === -1) {
+    list.push(code);
+    state.owned[collId] = list;
+    celebrateOnAdd(collId, list.length);
+  } else if (!owned && idx !== -1) {
+    list.splice(idx, 1);
+    state.owned[collId] = list;
+  }
   saveState();
 }
 
-function toggleWishlist(collId, code) {
+function setWishlistState(collId, code, on) {
   var list = wishlistList(collId);
-  var i = list.indexOf(code);
-  if (i !== -1) { list.splice(i, 1); } else { list.push(code); }
+  var idx = list.indexOf(code);
+  if (on && idx === -1) { list.push(code); }
+  else if (!on && idx !== -1) { list.splice(idx, 1); }
   state.wishlist[collId] = list;
   saveState();
 }
 
-/* ── Collection rendering ──────────────────────────────── */
-function currentCollection() {
-  var cols = window.SENNELIER_COLLECTIONS || [];
-  return cols.filter(function (c) { return c.id === activeCollectionId; })[0] || cols[0] || null;
+function setRestockState(collId, code, on) {
+  var list = restockList(collId);
+  var idx = list.indexOf(code);
+  if (on && idx === -1) { list.push(code); }
+  else if (!on && idx !== -1) { list.splice(idx, 1); }
+  state.restock[collId] = list;
+  saveState();
 }
 
+function toggleOwned(collId, code) { setOwnedState(collId, code, !isOwned(collId, code)); }
+function toggleWishlist(collId, code) { setWishlistState(collId, code, !isWishlisted(collId, code)); }
+function toggleRestock(collId, code) { setRestockState(collId, code, !isRestocked(collId, code)); }
+
+/* ── Milestones & toasts ───────────────────────────────── */
+function milestoneTier(pct) {
+  var t = 0;
+  MILESTONES.forEach(function (m) { if (pct >= m) { t = m; } });
+  return t;
+}
+
+function celebrateOnAdd(collId, count) {
+  var coll = getCollectionById(collId);
+  if (!coll) { return; }
+  var total = (coll.colors || []).length;
+  if (!total) { return; }
+  var tier = milestoneTier((count / total) * 100);
+  if (tier > 0) {
+    var key = collId + ":" + tier;
+    if (!celebrated[key]) {
+      celebrated[key] = true;
+      if (tier === 100) {
+        toast("🏆 You've collected the ENTIRE " + coll.name + " range!");
+      } else {
+        toast("🎉 You've collected " + tier + "% of " + coll.name + "!");
+      }
+    }
+  }
+}
+
+function toast(msg) {
+  var wrap = $("#toasts");
+  var t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(function () {
+    t.classList.add("out");
+    setTimeout(function () { t.remove(); }, 400);
+  }, 3200);
+}
+
+/* ── Colour helpers (hex -> HSL -> family, hue sort) ───── */
+function hexToHsl(hex) {
+  hex = String(hex || "").replace("#", "");
+  if (hex.length === 3) { hex = hex.split("").map(function (c) { return c + c; }).join(""); }
+  var r = parseInt(hex.slice(0, 2), 16) / 255;
+  var g = parseInt(hex.slice(2, 4), 16) / 255;
+  var b = parseInt(hex.slice(4, 6), 16) / 255;
+  if (isNaN(r)) { r = 0.5; g = 0.5; b = 0.5; }
+  var max = Math.max(r, g, b), min = Math.min(r, g, b);
+  var l = (max + min) / 2;
+  var d = max - min;
+  var s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  var h = 0;
+  if (d) {
+    if (max === r) { h = ((g - b) / d) % 6; }
+    else if (max === g) { h = (b - r) / d + 2; }
+    else { h = (r - g) / d + 4; }
+    h *= 60;
+    if (h < 0) { h += 360; }
+  }
+  return { h: h, s: s, l: l };
+}
+
+function colorFamily(hex) {
+  var c = hexToHsl(hex);
+  if (c.s < 0.12 || c.l < 0.12 || c.l > 0.9) { return "Neutral"; }
+  if (c.h < 15 || c.h >= 345) { return "Red"; }
+  if (c.h < 40) { return "Orange"; }
+  if (c.h < 70) { return "Yellow"; }
+  if (c.h < 165) { return "Green"; }
+  if (c.h < 260) { return "Blue"; }
+  if (c.h < 300) { return "Purple"; }
+  return "Pink";
+}
+
+function sortByHue(colors) {
+  return colors.slice().sort(function (a, b) {
+    var ca = hexToHsl(a.hex), cb = hexToHsl(b.hex);
+    var na = ca.s < 0.12 ? -1 : ca.h;
+    var nb = cb.s < 0.12 ? -1 : cb.h;
+    if (na === -1 && nb !== -1) { return 1; }
+    if (nb === -1 && na !== -1) { return -1; }
+    return na - nb;
+  });
+}
+
+/* ── Progress ring ─────────────────────────────────────── */
+function ringHTML(pct, size) {
+  pct = Math.max(0, Math.min(100, pct || 0));
+  var stroke = Math.max(6, Math.round(size * 0.09));
+  var r = (size - stroke) / 2;
+  var c = 2 * Math.PI * r;
+  var off = c * (1 - pct / 100);
+  var font = Math.round(size * 0.22);
+  return '<svg class="ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
+    '<circle class="ring-bg" cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + r + '" fill="none" stroke-width="' + stroke + '"/>' +
+    '<circle class="ring-fg" cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + r + '" fill="none" stroke-width="' + stroke + '" stroke-linecap="round" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" transform="rotate(-90 ' + (size / 2) + ' ' + (size / 2) + ')"/>' +
+    '<text class="ring-label" x="' + (size / 2) + '" y="' + (size / 2) + '" dominant-baseline="central" text-anchor="middle" font-size="' + font + '">' + Math.round(pct) + '%</text>' +
+    '</svg>';
+}
+
+/* ── Aggregates ────────────────────────────────────────── */
+function totalCounts() {
+  var totalColors = 0, totalOwned = 0, totalWish = 0, totalRestock = 0;
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+    totalColors += (c.colors || []).length;
+    totalOwned += ownedList(c.id).length;
+    totalWish += wishlistList(c.id).length;
+    totalRestock += restockList(c.id).length;
+  });
+  return { colors: totalColors, owned: totalOwned, wish: totalWish, restock: totalRestock };
+}
+
+function ownedColorsAcrossAll() {
+  var result = [];
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+    ownedList(c.id).forEach(function (code) {
+      var color = (c.colors || []).filter(function (x) { return x.code === code; })[0];
+      if (color) { result.push({ collection: c, color: color }); }
+    });
+  });
+  return result;
+}
+
+/* ── Collection rendering ──────────────────────────────── */
 function renderCollectionTabs() {
-  var nav = $("#collection-tabs");
-  nav.innerHTML = "";
-  (window.SENNELIER_COLLECTIONS || []).forEach(function (coll) {
-    var btn = document.createElement("button");
-    btn.className = "coll-tab" + (coll.id === activeCollectionId ? " active" : "");
-    btn.textContent = coll.name;
-    btn.onclick = function () {
-      activeCollectionId = coll.id;
-      renderCollectionTabs();
-      renderCollection();
-    };
-    nav.appendChild(btn);
+  ["#collection-tabs", "#palette-tabs"].forEach(function (sel) {
+    var nav = $(sel);
+    if (!nav) { return; }
+    nav.innerHTML = "";
+    (window.SENNELIER_COLLECTIONS || []).forEach(function (coll) {
+      var btn = document.createElement("button");
+      btn.className = "coll-tab" + (coll.id === activeCollectionId ? " active" : "");
+      btn.textContent = coll.name;
+      btn.onclick = function () {
+        activeCollectionId = coll.id;
+        renderCollectionTabs();
+        renderCollection();
+        renderPalette();
+      };
+      nav.appendChild(btn);
+    });
   });
 }
 
@@ -181,10 +338,12 @@ function renderCollection() {
   $("#collection-blurb").textContent = coll.blurb || "";
   $("#collection-badge").style.display = coll.sample ? "inline-block" : "none";
 
-  var owned = ownedList(coll.id);
-  var wish = wishlistList(coll.id);
+  var owned = ownedList(coll.id).length;
+  var wish = wishlistList(coll.id).length;
+  var restock = restockList(coll.id).length;
   var total = (coll.colors || []).length;
-  $("#collection-count").textContent = owned.length + " owned · " + wish.length + " on wishlist · " + total + " total";
+  $("#collection-count").textContent =
+    owned + " owned · " + wish + " wishlist · " + restock + " restock · " + total + " total";
 
   var query = ($("#collection-search").value || "").trim().toLowerCase();
   var filter = $("#collection-filter").value;
@@ -198,9 +357,11 @@ function renderCollection() {
       String(c.code || "").toLowerCase().indexOf(query) !== -1;
     var o = isOwned(coll.id, c.code);
     var w = isWishlisted(coll.id, c.code);
+    var r = isRestocked(coll.id, c.code);
     var matchesFilter = true;
     if (filter === "owned") { matchesFilter = o; }
     else if (filter === "wishlist") { matchesFilter = w; }
+    else if (filter === "restock") { matchesFilter = r; }
     else if (filter === "missing") { matchesFilter = !o; }
     return matchesQuery && matchesFilter;
   });
@@ -217,9 +378,10 @@ function renderCollection() {
 function renderSwatch(coll, color) {
   var owned = isOwned(coll.id, color.code);
   var wish = isWishlisted(coll.id, color.code);
+  var restock = isRestocked(coll.id, color.code);
 
   var card = document.createElement("button");
-  card.className = "swatch" + (owned ? " owned" : "") + (wish ? " wish" : "");
+  card.className = "swatch" + (owned ? " owned" : "");
   card.type = "button";
   card.title = color.name + (owned ? " (owned)" : "");
 
@@ -230,12 +392,15 @@ function renderSwatch(coll, color) {
       '<span class="swatch-name">' + escapeHtml(color.name) + '</span>' +
     '</span>' +
     '<span class="swatch-owned">✓</span>' +
-    '<span class="swatch-star" title="Wishlist">' + (wish ? "★" : "☆") + '</span>';
+    '<span class="swatch-restock' + (restock ? " on" : "") + '" title="Restock">🔁</span>' +
+    '<span class="swatch-star' + (wish ? " on" : "") + '" title="Wishlist">' + (wish ? "★" : "☆") + '</span>';
 
   card.addEventListener("click", function (e) {
-    var star = e.target && e.target.closest ? e.target.closest(".swatch-star") : null;
-    if (star) {
+    var t = e.target;
+    if (t && t.closest && t.closest(".swatch-star")) {
       toggleWishlist(coll.id, color.code);
+    } else if (t && t.closest && t.closest(".swatch-restock")) {
+      toggleRestock(coll.id, color.code);
     } else {
       toggleOwned(coll.id, color.code);
     }
@@ -243,6 +408,184 @@ function renderSwatch(coll, color) {
   });
 
   return card;
+}
+
+/* ── Palette rendering ─────────────────────────────────── */
+function renderPalette() {
+  var coll = currentCollection();
+  var box = $("#palette-box");
+  if (!box) { return; }
+  if (!coll) {
+    box.innerHTML = '<div class="empty">No collection.</div>';
+    return;
+  }
+  var owned = (coll.colors || []).filter(function (c) { return isOwned(coll.id, c.code); });
+  $("#palette-count").textContent = owned.length + " colours in your palette";
+  if (owned.length === 0) {
+    box.innerHTML = '<div class="empty">Your palette is empty. Tap colours in the Collection tab to fill it.</div>';
+    return;
+  }
+  box.innerHTML = "";
+  sortByHue(owned).forEach(function (c) {
+    var chip = document.createElement("div");
+    chip.className = "palette-chip";
+    chip.title = (c.code || "—") + " · " + c.name;
+    chip.innerHTML =
+      '<span class="palette-dot" style="background:' + (c.hex || "#eee") + '"></span>' +
+      '<span class="palette-name">' + escapeHtml(c.name) + '</span>';
+    box.appendChild(chip);
+  });
+}
+
+/* ── Shopping list rendering ───────────────────────────── */
+function renderShopping() {
+  var list = $("#shopping-list");
+  var items = [];
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (coll) {
+    (coll.colors || []).forEach(function (color) {
+      var w = isWishlisted(coll.id, color.code);
+      var r = isRestocked(coll.id, color.code);
+      if (w || r) { items.push({ coll: coll, color: color, wish: w, restock: r }); }
+    });
+  });
+
+  $("#shopping-count").textContent = items.length + (items.length === 1 ? " item" : " items") + " on your list";
+  list.innerHTML = "";
+
+  if (items.length === 0) {
+    list.innerHTML = '<div class="empty">Nothing here yet. In the Collection tab, tap ☆ to wishlist or 🔁 to flag a restock.</div>';
+    return;
+  }
+
+  var byColl = {};
+  items.forEach(function (it) {
+    (byColl[it.coll.id] = byColl[it.coll.id] || { coll: it.coll, items: [] }).items.push(it);
+  });
+
+  Object.keys(byColl).forEach(function (key) {
+    var group = byColl[key];
+    var h = document.createElement("h3");
+    h.textContent = group.coll.name;
+    list.appendChild(h);
+    group.items.forEach(function (it) { list.appendChild(shoppingRow(it)); });
+  });
+}
+
+function shoppingRow(it) {
+  var row = document.createElement("div");
+  row.className = "shop-row";
+  row.innerHTML =
+    '<span class="swatch-chip" style="background:' + (it.color.hex || "#eee") + '"></span>' +
+    '<div class="shop-info">' +
+      '<span class="shop-name">' + escapeHtml(it.color.name) + '</span>' +
+      '<span class="shop-code">' + escapeHtml(it.color.code || "—") + '</span>' +
+    '</div>' +
+    (it.wish ? '<span class="shop-badge wish">☆ want</span>' : "") +
+    (it.restock ? '<span class="shop-badge restock">🔁 restock</span>' : "") +
+    '<button class="btn btn-small" data-act="got">✓ Got it</button>' +
+    '<button class="btn btn-small btn-danger" data-act="clear">✕</button>';
+
+  row.querySelector('[data-act="got"]').onclick = function () {
+    setOwnedState(it.coll.id, it.color.code, true);
+    setWishlistState(it.coll.id, it.color.code, false);
+    setRestockState(it.coll.id, it.color.code, false);
+    refreshAll();
+  };
+  row.querySelector('[data-act="clear"]').onclick = function () {
+    setWishlistState(it.coll.id, it.color.code, false);
+    setRestockState(it.coll.id, it.color.code, false);
+    refreshAll();
+  };
+  return row;
+}
+
+/* ── Home dashboard rendering ──────────────────────────── */
+function renderHome() {
+  var t = totalCounts();
+  var overallPct = t.colors ? Math.round((t.owned / t.colors) * 100) : 0;
+
+  $("#home-hero").innerHTML =
+    ringHTML(overallPct, 130) +
+    '<div class="home-hero-text">' +
+      '<h2>' + t.owned + ' of ' + t.colors + ' sticks collected</h2>' +
+      '<p class="muted">' + overallPct + '% of your full collection</p>' +
+    '</div>';
+
+  $("#home-stats").innerHTML =
+    '<div class="stat-tiles">' +
+      statTile(t.owned, "sticks owned") +
+      statTile(t.wish, "wishlist") +
+      statTile(t.restock, "to restock") +
+      statTile(journal.length, "art pieces") +
+    '</div>';
+
+  var colsHTML = "";
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+    var owned = ownedList(c.id).length;
+    var total = (c.colors || []).length;
+    var pct = total ? Math.round((owned / total) * 100) : 0;
+    colsHTML +=
+      '<div class="coll-card">' +
+        ringHTML(pct, 60) +
+        '<div>' +
+          '<div class="cc-name">' + escapeHtml(c.name) + '</div>' +
+          '<div class="cc-sub">' + owned + ' / ' + total + ' · ' + pct + '%</div>' +
+        '</div>' +
+      '</div>';
+  });
+  $("#home-collections").innerHTML = colsHTML || '<div class="empty">No collections yet.</div>';
+
+  var shop = t.wish + t.restock;
+  $("#home-shopping").innerHTML = shop > 0
+    ? '<h3>🛍️ Shopping</h3><p class="muted">You have <strong>' + shop + '</strong> item' + (shop === 1 ? "" : "s") + ' on your list.</p><button class="btn btn-primary home-shopping-btn" data-goto="shopping">Open shopping list →</button>'
+    : '<h3>🛍️ Shopping</h3><p class="muted">Your shopping list is empty.</p>';
+
+  var goto = $("#home-shopping").querySelector("[data-goto]");
+  if (goto) { goto.onclick = function () { switchTab("shopping"); }; }
+}
+
+function statTile(num, label) {
+  return '<div class="stat-tile"><div class="num">' + num + '</div><div class="lbl">' + label + '</div></div>';
+}
+
+/* ── Stats rendering ───────────────────────────────────── */
+function renderStats() {
+  var t = totalCounts();
+  var overallPct = t.colors ? Math.round((t.owned / t.colors) * 100) : 0;
+
+  $("#stats-overview").innerHTML =
+    '<div class="stats-overview">' +
+      '<div class="ov"><div class="num">' + t.owned + '</div><div class="lbl">sticks owned</div></div>' +
+      '<div class="ov"><div class="num">' + t.colors + '</div><div class="lbl">colours available</div></div>' +
+      '<div class="ov"><div class="num">' + overallPct + '%</div><div class="lbl">overall collected</div></div>' +
+      '<div class="ov"><div class="num">' + t.wish + '</div><div class="lbl">wishlist</div></div>' +
+      '<div class="ov"><div class="num">' + t.restock + '</div><div class="lbl">to restock</div></div>' +
+    '</div>';
+
+  var families = {};
+  ownedColorsAcrossAll().forEach(function (item) {
+    var f = colorFamily(item.color.hex);
+    families[f] = (families[f] || 0) + 1;
+  });
+
+  var entries = Object.keys(families).map(function (k) { return { name: k, count: families[k] }; })
+    .filter(function (e) { return e.count > 0; })
+    .sort(function (a, b) { return b.count - a.count; });
+
+  var box = $("#stats-families");
+  if (entries.length === 0) {
+    box.innerHTML = '<div class="empty">Collect some colours to see your favourite families.</div>';
+  } else {
+    var max = entries[0].count;
+    box.innerHTML = '<div class="bars">' + entries.map(function (e) {
+      var w = Math.round((e.count / max) * 100);
+      return '<div class="bar-row">' +
+        '<span class="bar-name">' + e.name + '</span>' +
+        '<div class="bar"><div class="bar-fill" style="width:' + w + '%"></div></div>' +
+        '<span class="bar-count">' + e.count + '</span>' +
+      '</div>';
+    }).join("") + '</div>';
+  }
 }
 
 /* ── Notes rendering ───────────────────────────────────── */
@@ -303,7 +646,7 @@ function deleteNote(id) {
   renderNotes();
 }
 
-/* ── Journal rendering ─────────────────────────────────── */
+/* ── Journal ───────────────────────────────────────────── */
 function loadJournal() {
   return idbGetAll().then(function (rows) {
     journal = rows.sort(function (a, b) {
@@ -316,15 +659,13 @@ function loadJournal() {
 }
 
 function renderJournal() {
-  return loadJournal().then(function () {
-    var grid = $("#journal-grid");
-    grid.innerHTML = "";
-    if (journal.length === 0) {
-      grid.innerHTML = '<div class="empty">No art entries yet. Click "＋ Add art" to add your first piece.</div>';
-    }
-    journal.forEach(function (entry) {
-      grid.appendChild(renderJournalCard(entry));
-    });
+  var grid = $("#journal-grid");
+  grid.innerHTML = "";
+  if (journal.length === 0) {
+    grid.innerHTML = '<div class="empty">No art entries yet. Click "＋ Add art" to add your first piece.</div>';
+  }
+  journal.forEach(function (entry) {
+    grid.appendChild(renderJournalCard(entry));
   });
 }
 
@@ -350,7 +691,7 @@ function renderJournalCard(entry) {
   el.querySelector('[data-act="edit"]').onclick = function () { openJournalForm(entry); };
   el.querySelector('[data-act="del"]').onclick = function () {
     if (confirm("Delete this entry?")) {
-      idbDelete(entry.id).then(renderJournal).catch(function () {});
+      idbDelete(entry.id).then(loadJournal).then(renderJournal).catch(function () {});
     }
   };
   return el;
@@ -412,13 +753,13 @@ function saveJournalEntry() {
 
   idbPut(entry).then(function () {
     closeJournalForm();
-    renderJournal();
-  }).catch(function () {
+    return loadJournal();
+  }).then(renderJournal).catch(function () {
     alert("Could not save the entry.");
   });
 }
 
-/* ── Image resize (keeps backups/storage small) ────────── */
+/* ── Image resize ──────────────────────────────────────── */
 function resizeImage(file, maxDim, quality) {
   return new Promise(function (resolve, reject) {
     var reader = new FileReader();
@@ -450,10 +791,11 @@ function exportData() {
   loadJournal().then(function () {
     var payload = {
       app: "sennelier-studio",
-      version: 1,
+      version: 2,
       exportedAt: new Date().toISOString(),
       owned: state.owned,
       wishlist: state.wishlist,
+      restock: state.restock,
       notes: state.notes,
       journal: journal
     };
@@ -487,6 +829,7 @@ function importData(file) {
 
     state.owned = payload.owned || {};
     state.wishlist = payload.wishlist || {};
+    state.restock = payload.restock || {};
     state.notes = payload.notes || [];
     saveState();
 
@@ -515,16 +858,26 @@ function switchTab(tabId) {
   $$(".view").forEach(function (v) {
     v.classList.toggle("active", v.id === "view-" + tabId);
   });
+  if (tabId === "home") { renderHome(); }
   if (tabId === "collection") { renderCollection(); }
+  if (tabId === "palette") { renderCollectionTabs(); renderPalette(); }
+  if (tabId === "shopping") { renderShopping(); }
+  if (tabId === "stats") { renderStats(); }
   if (tabId === "notes") { renderNotes(); }
   if (tabId === "journal") { renderJournal(); }
 }
 
 function refreshAll() {
-  renderCollectionTabs();
-  renderCollection();
-  renderNotes();
-  return renderJournal();
+  return loadJournal().then(function () {
+    renderCollectionTabs();
+    renderHome();
+    renderCollection();
+    renderPalette();
+    renderShopping();
+    renderStats();
+    renderNotes();
+    renderJournal();
+  });
 }
 
 /* ── Wire up events ────────────────────────────────────── */
