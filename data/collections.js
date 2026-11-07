@@ -35,8 +35,6 @@
 window.SENNELIER_COLLECTIONS = [
 
   // ── Sennelier Oil Pastels ───────────────────────────────────────────────
-  // Full 120-colour range. Names/numbers from the official chart; true colours
-  // from retailer swatches (pontodasartes.com).
   {
     id: "oil-pastels",
     name: "Oil Pastels",
@@ -108,16 +106,16 @@ window.SENNELIER_COLLECTIONS = [
       { code: "096", name: "Payne Grey", hex: "#222631" },
       { code: "098", name: "Mars Black", hex: "#292C31" },
       { code: "099", name: "Suede Titanium", hex: "#EBC282" },
-      { code: "111", name: "Aluminium", hex: "#b8b8b8" },
-      { code: "112", name: "Pale Gold", hex: "#dfb63a" },
+      { code: "111", name: "Aluminium", hex: "#AAADB6" },
+      { code: "112", name: "Pale Gold", hex: "#BA9777" },
       { code: "113", name: "Pale Rich Gold", hex: "#C5A677" },
-      { code: "114", name: "Rich Gold", hex: "#dfb63a" },
-      { code: "115", name: "Red Copper", hex: "#d33122" },
-      { code: "123", name: "Transparent Blue", hex: "#3060cf" },
-      { code: "125", name: "Iridescent White", hex: "#f0f0ef" },
-      { code: "132", name: "Golden Pearl", hex: "#dfb63a" },
-      { code: "134", name: "Red Gold", hex: "#dfb63a" },
-      { code: "135", name: "Reddish Brown Gold", hex: "#dfb63a" },
+      { code: "114", name: "Gold Rich", hex: "#A57753" },
+      { code: "115", name: "Copper Reddish", hex: "#B3775F" },
+      { code: "123", name: "Transparent Blue", hex: "#9BD7E7" },
+      { code: "125", name: "White", hex: "#FFFFFF" },
+      { code: "132", name: "Golden Pearl", hex: "#F4D17D" },
+      { code: "134", name: "Red Gold", hex: "#EF854B" },
+      { code: "135", name: "Reddish Gold", hex: "#B45050" },
       { code: "200", name: "Mandarin", hex: "#D7452C" },
       { code: "201", name: "Nickel Yellow", hex: "#F7EF70" },
       { code: "202", name: "Light Geranium Lake", hex: "#F6778A" },
@@ -165,9 +163,99 @@ window.SENNELIER_COLLECTIONS = [
     ]
   },
 
+  // ── Sennelier Oil Pastels — Iridescent ──────────────────────────────────
+  {
+    id: "oil-pastels-iridescent",
+    name: "Oil Pastels — Iridescent",
+    blurb: "Shimmery metallic oil pastels — 10 colours.",
+    colors: [
+      { code: "111", name: "Aluminium", hex: "#AAADB6" },
+      { code: "112", name: "Pale Gold", hex: "#BA9777" },
+      { code: "113", name: "Pale Rich Gold", hex: "#C5A677" },
+      { code: "114", name: "Gold Rich", hex: "#A57753" },
+      { code: "115", name: "Copper Reddish", hex: "#B3775F" },
+      { code: "123", name: "Transparent Blue", hex: "#9BD7E7" },
+      { code: "125", name: "White", hex: "#FFFFFF" },
+      { code: "132", name: "Golden Pearl", hex: "#F4D17D" },
+      { code: "134", name: "Red Gold", hex: "#EF854B" },
+      { code: "135", name: "Reddish Gold", hex: "#B45050" }
+    ]
+  },
+
+  // ── Sennelier Extra-Fine Oil Sticks ─────────────────────────────────────
+  {
+    id: "oil-sticks",
+    name: "Oil Sticks (Extra-Fine)",
+    blurb: "Oil paint in stick form — 64 colours.",
+    colors: [
+      { code: "020", name: "Pearl White", hex: "#BAB8AB" },
+      { code: "022", name: "Bronze", hex: "#6F6446" },
+      { code: "028", name: "Gold", hex: "#EAA851" },
+      { code: "029", name: "Silver", hex: "#A4ACB9" },
+      { code: "036", name: "Copper", hex: "#A7594C" },
+      { code: "116", name: "Titanium White", hex: "#F0EEEE" },
+      { code: "136", name: "Titanium Suede", hex: "#F4DDB1" },
+      { code: "140", name: "Iridescent White", hex: "#FFFFFF" },
+      { code: "202", name: "Burnt Umber", hex: "#3D3332" },
+      { code: "208", name: "Raw Sienna", hex: "#A66642" },
+      { code: "250", name: "Flesh Ochre", hex: "#E9B9AB" },
+      { code: "252", name: "Yellow Ochre", hex: "#D79042" },
+      { code: "253", name: "Pale Ochre", hex: "#F4D992" },
+      { code: "259", name: "Red Ochre", hex: "#A24438" },
+      { code: "307", name: "Cobalt Blue", hex: "#055CAC" },
+      { code: "308", name: "Indigo Blue", hex: "#45788D" },
+      { code: "318", name: "Prussian Blue", hex: "#224563" },
+      { code: "323", name: "Cerulean Blue", hex: "#0380BA" },
+      { code: "341", name: "Turquoise Blue", hex: "#019481" },
+      { code: "346", name: "Chinese Blue", hex: "#276A7B" },
+      { code: "357", name: "Ultramarine Blue", hex: "#25409B" },
+      { code: "365", name: "Light Blue", hex: "#2693CE" },
+      { code: "385", name: "Primary Blue", hex: "#195C91" },
+      { code: "407", name: "Van Dyck brown", hex: "#542722" },
+      { code: "438", name: "Sepia", hex: "#565550" },
+      { code: "444", name: "Golden Brown", hex: "#F8CE3C" },
+      { code: "499", name: "Perylen Brown", hex: "#542128" },
+      { code: "502", name: "Fluo Yellow", hex: "#E5E01A" },
+      { code: "529", name: "Cadmium Yellow Light", hex: "#FFF371" },
+      { code: "533", name: "Cadmium Yellow Deep", hex: "#FBAE20" },
+      { code: "535", name: "Cadmium Yellow Lemon", hex: "#FEF262" },
+      { code: "548", name: "Yellow Orange Permanent", hex: "#F0AD3C" },
+      { code: "567", name: "Naples Yellow", hex: "#FFF582" },
+      { code: "573", name: "Bismuth Yellow", hex: "#FCEA40" },
+      { code: "574", name: "Primary Yellow", hex: "#FFEC36" },
+      { code: "605", name: "Cadmium Red Light", hex: "#E7463C" },
+      { code: "611", name: "Cadmium Red Purple", hex: "#CF3E39" },
+      { code: "635", name: "Carmine Red", hex: "#9A3034" },
+      { code: "640", name: "Saturn Red", hex: "#F2681D" },
+      { code: "643", name: "Light Saturn Red", hex: "#D45640" },
+      { code: "645", name: "Chinese Orange", hex: "#AE2417" },
+      { code: "648", name: "Fluo Orange", hex: "#E73C29" },
+      { code: "652", name: "Bourdeaux Perylene Light", hex: "#F4BDB8" },
+      { code: "654", name: "Fluo Pink", hex: "#E1216A" },
+      { code: "671", name: "Helium Purple", hex: "#591023" },
+      { code: "672", name: "Light Quinacridone Red", hex: "#76184C" },
+      { code: "675", name: "French Vermilion Red", hex: "#E7453A" },
+      { code: "686", name: "Primary Red", hex: "#C32D4A" },
+      { code: "687", name: "Cadmium Orange", hex: "#F57C2D" },
+      { code: "701", name: "Neutral Gray", hex: "#6D7075" },
+      { code: "703", name: "Payne´s Grey", hex: "#354052" },
+      { code: "705", name: "Warm Gray", hex: "#947F64" },
+      { code: "707", name: "Cool Grey", hex: "#778997" },
+      { code: "759", name: "Black Mars", hex: "#1C201F" },
+      { code: "769", name: "Perylene Black", hex: "#060A09" },
+      { code: "815", name: "Chromium Oxide Green", hex: "#548164" },
+      { code: "833", name: "Cobalt Green Light", hex: "#009E7D" },
+      { code: "845", name: "Permanent Green", hex: "#03662D" },
+      { code: "847", name: "Emerald Green", hex: "#00AB67" },
+      { code: "863", name: "Celadon Green", hex: "#A4C8A4" },
+      { code: "871", name: "Bright Yellow Green", hex: "#6BAE2B" },
+      { code: "895", name: "Fluo Green", hex: "#75B72C" },
+      { code: "914", name: "Manganese Violet", hex: "#5E3B7B" },
+      { code: "971", name: "Light Dioxazine Purple", hex: "#725399" }
+    ]
+  },
+
   // ── Sennelier Soft Pastels "à l'écu" ────────────────────────────────────
-  // 499 colours, with true colours from retailer swatches
-  // (pontodasartes.com) and official colour names/numbers.
   {
     id: "soft-pastels",
     name: "Soft Pastels (à l'écu)",
@@ -672,6 +760,40 @@ window.SENNELIER_COLLECTIONS = [
       { code: "956", name: "Green Jade", hex: "#82BAAF" },
       { code: "957", name: "Imperial Green", hex: "#016950" },
       { code: "958", name: "Grey Cendre", hex: "#5A655D" }
+    ]
+  },
+
+  // ── Sennelier Soft Pastels "à l'écu" — Iridescent ───────────────────────
+  {
+    id: "soft-pastels-iridescent",
+    name: "Soft Pastels — Iridescent",
+    blurb: "Shimmery iridescent soft pastels — 25 colours.",
+    colors: [
+      { code: "801", name: "White", hex: "#FFFFFF" },
+      { code: "802", name: "Dark Yellow", hex: "#F5CC63" },
+      { code: "803", name: "White Yellow", hex: "#FCE53D" },
+      { code: "804", name: "Dark Red", hex: "#E3604E" },
+      { code: "805", name: "Medium Red", hex: "#F16D60" },
+      { code: "806", name: "Sloe", hex: "#E0889E" },
+      { code: "807", name: "Lilac", hex: "#D64969" },
+      { code: "808", name: "Bright Blue", hex: "#265FA4" },
+      { code: "809", name: "French Blue", hex: "#3E8CB2" },
+      { code: "810", name: "Sky Blue", hex: "#4BAAE4" },
+      { code: "811", name: "Dark Green", hex: "#008568" },
+      { code: "812", name: "Medium Green", hex: "#32A77D" },
+      { code: "813", name: "Olive Green", hex: "#6C9279" },
+      { code: "814", name: "Yellow Ochre", hex: "#CC872A" },
+      { code: "815", name: "Red Ochre", hex: "#D34730" },
+      { code: "816", name: "Black", hex: "#000000" },
+      { code: "817", name: "Sienna Land", hex: "#E18F67" },
+      { code: "818", name: "Light Sienna Land", hex: "#E48833" },
+      { code: "819", name: "Burndt Shadow Land", hex: "#AB8F67" },
+      { code: "820", name: "Shadow Land", hex: "#D2B895" },
+      { code: "821", name: "Silver", hex: "#79787E" },
+      { code: "822", name: "Dark Gold", hex: "#C2B682" },
+      { code: "823", name: "Green Gold", hex: "#D2CABF" },
+      { code: "824", name: "Yellow Gold", hex: "#EDCB9D" },
+      { code: "825", name: "Copper", hex: "#DCB79A" }
     ]
   }
 
