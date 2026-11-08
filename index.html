@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Art Studio</title>
-  <link rel="stylesheet" href="styles.css?v=11" />
+  <link rel="stylesheet" href="styles.css?v=12" />
 </head>
 <body>
   <header class="site-header">
@@ -31,6 +31,7 @@
     <button class="tab tab-special" data-tab="sets">✨ Sets</button>
     <button class="tab" data-tab="shopping">🛍️ Shopping</button>
     <button class="tab" data-tab="stats">📊 Stats</button>
+    <button class="tab" data-tab="titles">🏅 Titles</button>
     <button class="tab" data-tab="notes">📓 Notes</button>
     <button class="tab" data-tab="journal">🖼️ Journal</button>
     <button class="tab" data-tab="help">📖 Help</button>
@@ -119,6 +120,25 @@
       <div class="card">
         <h3>Colour families you collect</h3>
         <div id="stats-families"></div>
+      </div>
+    </section>
+
+    <!-- ══════════ TITLES ══════════ -->
+    <section id="view-titles" class="view">
+      <div id="titles-rank"></div>
+      <div class="card">
+        <h3>🥇 Collection Masters</h3>
+        <p class="muted">Collect a full range to earn its Master title.</p>
+        <div id="titles-collections" class="titles-grid"></div>
+      </div>
+      <div class="card">
+        <h3>✨ Special Set Titles</h3>
+        <p class="muted">Collect a special set to earn its title.</p>
+        <div id="titles-sets" class="titles-grid"></div>
+      </div>
+      <div class="card">
+        <h3>🎉 Fun Titles</h3>
+        <div id="titles-fun" class="titles-grid"></div>
       </div>
     </section>
 
@@ -214,7 +234,7 @@
     <p>Made with 💛 for a very special artist. Your data stays on your device.</p>
   </footer>
 
-  <script src="data/collections.js?v=11"></script>
-  <script src="app.js?v=11"></script>
+  <script src="data/collections.js?v=12"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

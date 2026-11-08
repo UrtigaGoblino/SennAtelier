@@ -629,6 +629,27 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 .btn-special { background: linear-gradient(135deg, #f6d365, #f0b45a); color: #5a3d00; border-color: transparent; }
 .btn-special:hover { background: linear-gradient(135deg, #f3cc4f, #e8a94a); }
 
+/* ── Titles & achievements ──────────────────────────────── */
+.rank-chip { display: inline-block; margin-top: 8px; background: linear-gradient(135deg, #fff2cc, #ffe1a8); color: #6b4400; font-weight: 700; border-radius: 999px; padding: 4px 12px; font-size: 0.85rem; }
+.rank-card { display: flex; gap: 16px; align-items: center; background: linear-gradient(135deg, #fff9ec, #fff2d6); border: 2px solid #f0d9a8; border-radius: 16px; padding: 18px; box-shadow: var(--shadow); flex-wrap: wrap; margin-bottom: 16px; }
+.rank-icon { font-size: 2.6rem; line-height: 1; }
+.rank-body { flex: 1; min-width: 200px; }
+.rank-label { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.rank-title { font-size: 1.4rem; font-weight: 800; color: #6b4400; line-height: 1.2; }
+.rank-sub { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+.rank-next { font-size: 0.85rem; margin-top: 8px; }
+.rank-bar { height: 10px; background: #f3e6cc; border-radius: 999px; overflow: hidden; margin-top: 6px; }
+.rank-bar-fill { height: 100%; background: linear-gradient(90deg, #f6d365, #e8a94a); border-radius: 999px; transition: width 0.4s; }
+.titles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.title-card { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line); background: #fff; }
+.title-card.unlocked { border-color: #f0d9a8; background: linear-gradient(180deg, #fffdf7, #fff8ea); box-shadow: 0 2px 10px rgba(180, 140, 60, 0.12); }
+.title-card.locked { opacity: 0.62; }
+.title-icon { font-size: 1.5rem; line-height: 1; }
+.title-name { font-weight: 700; font-size: 0.95rem; }
+.title-sub { font-size: 0.76rem; color: var(--muted); }
+.set-title { margin-top: 2px; font-size: 0.8rem; font-weight: 700; color: #b8860b; }
+.goal-ico { font-size: 1rem; }
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 640px) {
   .home-grid { grid-template-columns: 1fr; }

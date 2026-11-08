@@ -14,6 +14,30 @@ var DB_STORE = "journal";
 var DB_VERSION = 1;
 var MILESTONES = [25, 50, 75, 100];
 
+/* Collector ranks — earned by total colour sticks owned (count-based, no %) */
+var RANKS = [
+  { min: 0,   icon: "🌱", title: "Curious Beginner" },
+  { min: 1,   icon: "🖌️", title: "First Brushstroke" },
+  { min: 10,  icon: "🎨", title: "Colour Collector" },
+  { min: 50,  icon: "🌈", title: "Palette Explorer" },
+  { min: 150, icon: "💎", title: "Hue Hero" },
+  { min: 400, icon: "🏆", title: "Colour Maestro" },
+  { min: 800, icon: "👑", title: "Legend of Colour" }
+];
+
+function pctOf(owned, total) { return total ? (owned / total) * 100 : 0; }
+function rankFor(owned) {
+  var r = RANKS[0];
+  RANKS.forEach(function (x) { if (owned >= x.min) { r = x; } });
+  return r;
+}
+function nextRankFrom(owned) {
+  for (var i = 0; i < RANKS.length; i++) {
+    if (owned < RANKS[i].min) { return RANKS[i]; }
+  }
+  return null;
+}
+
 /* ── State ─────────────────────────────────────────────── */
 var state = {
   owned: {},     // { collectionId: [code, ...] }
@@ -565,7 +589,8 @@ function renderSetCard(coll, color) {
   main.innerHTML =
     '<span class="set-top"><span class="set-dot" style="background:' + (color.hex || "#eee") + '"></span><span class="set-check">✓</span></span>' +
     '<span class="set-name">' + escapeHtml(color.name) + '</span>' +
-    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>';
+    '<span class="set-ref">#' + escapeHtml(color.code) + '</span>' +
+    (owned && color.title ? '<span class="set-title">' + escapeHtml((color.icon || "") + " " + color.title) + '</span>' : '');
   main.addEventListener("click", function () {
     toggleOwned(coll.id, color.code);
     renderSetsView();
@@ -673,12 +698,17 @@ function renderHome() {
   var t = totalCounts();
   var overallPct = t.colors ? Math.round((t.owned / t.colors) * 100) : 0;
 
+  var rank = rankFor(t.owned);
   $("#home-hero").innerHTML =
     ringHTML(overallPct, 130) +
     '<div class="home-hero-text">' +
       '<h2>' + t.owned + ' of ' + t.colors + ' sticks collected</h2>' +
       '<p class="muted">' + overallPct + '% of your full collection</p>' +
+      '<div class="rank-chip">' + rank.icon + ' ' + escapeHtml(rank.title) + '</div>' +
+      '<div style="margin-top:8px"><button class="btn btn-small" data-goto="titles">🏅 View titles →</button></div>' +
     '</div>';
+  var titlesBtn = $("#home-hero").querySelector("[data-goto]");
+  if (titlesBtn) { titlesBtn.onclick = function () { switchTab("titles"); }; }
 
   $("#home-stats").innerHTML =
     '<div class="stat-tiles">' +
@@ -732,44 +762,146 @@ function statTile(num, label) {
   return '<div class="stat-tile"><div class="num">' + num + '</div><div class="lbl">' + label + '</div></div>';
 }
 
-/* ── Visible "next goals" (milestones ahead) ───────────── */
-function nextMilestone(pct) {
-  for (var i = 0; i < MILESTONES.length; i++) {
-    if (pct < MILESTONES[i]) { return MILESTONES[i]; }
-  }
-  return null;
-}
-
+/* ── Goals: tangible "next rewards" to unlock (no arbitrary %) ── */
 function renderGoals() {
   var box = $("#home-goals");
   if (!box) { return; }
-  var items = [], complete = [];
-  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+  var t = totalCounts();
+  var goals = [];
+
+  var nr = nextRankFrom(t.owned);
+  if (nr) { goals.push({ icon: nr.icon, label: nr.title, sub: "collector rank", need: nr.min - t.owned }); }
+
+  colourCollections().forEach(function (c) {
     var total = (c.colors || []).length;
     if (!total) { return; }
-    var owned = ownedList(c.id).length;
-    var pct = (owned / total) * 100;
-    var nm = nextMilestone(pct);
-    if (nm === null) { complete.push(c.name); return; }
-    var need = Math.ceil((nm / 100) * total) - owned;
-    items.push({ label: (c.brand || "") + " · " + c.name, nm: nm, need: need });
+    var need = total - ownedList(c.id).length;
+    if (need <= 0) { return; }
+    goals.push({ icon: "🥇", label: c.name + " Master", sub: c.brand || "", need: need });
   });
-  items.sort(function (a, b) { return a.need - b.need; });
-  var html = '<h3>🎯 Next goals</h3>';
-  if (!items.length && !complete.length) {
-    html += '<p class="muted">No collections yet.</p>';
+
+  setsCollections().forEach(function (c) {
+    c.colors.forEach(function (col) {
+      if (!isOwned(c.id, col.code)) {
+        goals.push({ icon: col.icon || "🎁", label: col.title || col.name, sub: col.name, need: 1 });
+      }
+    });
+  });
+
+  goals.sort(function (a, b) { return a.need - b.need; });
+  var top = goals.slice(0, 5);
+
+  var html = '<h3>🎯 Goals — next rewards</h3>';
+  if (!top.length) {
+    html += '<p class="muted">🏆 You unlocked everything. Legendary!</p>';
   } else {
-    if (items.length) {
-      html += items.map(function (it) {
-        return '<div class="goal-row"><span class="goal-name">' + escapeHtml(it.label) + '</span>' +
-          '<span class="goal-next">🎯 ' + it.nm + '% <span class="muted">(' + it.need + ' more)</span></span></div>';
-      }).join("");
-    }
-    if (complete.length) {
-      html += '<p class="muted">🏆 Complete: ' + complete.map(escapeHtml).join(", ") + '</p>';
-    }
+    html += top.map(function (g) {
+      var when = g.need === 1 ? "1 to go" : (g.need + " to go");
+      return '<div class="goal-row"><span class="goal-name"><span class="goal-ico">' + g.icon + '</span> ' +
+        escapeHtml(g.label) + (g.sub ? ' <span class="muted">· ' + escapeHtml(g.sub) + '</span>' : '') + '</span>' +
+        '<span class="goal-next">' + when + '</span></div>';
+    }).join("");
+    html += '<button class="btn btn-small" data-goto="titles" style="margin-top:10px">See all titles →</button>';
   }
   box.innerHTML = html;
+  var b = box.querySelector("[data-goto]");
+  if (b) { b.onclick = function () { switchTab("titles"); }; }
+}
+
+/* ── Fun titles (special mini-achievements) ────────────── */
+function funTitles() {
+  var t = totalCounts();
+  var setsOwned = 0;
+  setsCollections().forEach(function (c) { setsOwned += ownedList(c.id).length; });
+  var fams = {};
+  ownedColorsAcrossAll().forEach(function (item) { fams[colorFamily(item.color.hex)] = 1; });
+  var famCount = Object.keys(fams).length;
+  var iridOwned = false;
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+    if (/iridescent/i.test(c.name) || /iridescent/i.test(c.id)) {
+      if (ownedList(c.id).length > 0) { iridOwned = true; }
+    }
+  });
+  return [
+    { icon: "🎁", title: "Set Collector", desc: "Own a special set", on: setsOwned >= 1 },
+    { icon: "✨", title: "Iridescent Dreamer", desc: "Own an iridescent colour", on: iridOwned },
+    { icon: "🌈", title: "Rainbow Rider", desc: "Own colours from 6+ families", on: famCount >= 6 },
+    { icon: "📝", title: "Note Taker", desc: "Write a note", on: state.notes.length >= 1 },
+    { icon: "🖼️", title: "Art Journalist", desc: "Add an art journal entry", on: journal.length >= 1 },
+    { icon: "🛍️", title: "Wishlister", desc: "5+ items on your wishlist", on: t.wish >= 5 },
+    { icon: "🔁", title: "Restocker", desc: "3+ items to rebuy", on: t.restock >= 3 },
+    { icon: "👑", title: "Completionist", desc: "Own every colour", on: t.colors > 0 && t.owned >= t.colors }
+  ];
+}
+
+/* ── Titles tab ────────────────────────────────────────── */
+function renderTitles() {
+  var t = totalCounts();
+  var rank = rankFor(t.owned);
+  var next = nextRankFrom(t.owned);
+  var rankEl = $("#titles-rank");
+  if (rankEl) {
+    var nextHtml;
+    if (next) {
+      var need = next.min - t.owned;
+      var span = next.min - rank.min;
+      var prog = span > 0 ? Math.max(0, Math.min(100, ((t.owned - rank.min) / span) * 100)) : 100;
+      nextHtml = '<div class="rank-next">Next: ' + next.icon + ' <strong>' + next.title + '</strong> — ' + need + ' more stick' + (need === 1 ? "" : "s") + '</div>' +
+        '<div class="rank-bar"><div class="rank-bar-fill" style="width:' + prog + '%"></div></div>';
+    } else {
+      nextHtml = '<div class="rank-next">👑 Max rank reached — Legend of Colour!</div>';
+    }
+    rankEl.innerHTML =
+      '<div class="rank-card">' +
+        '<div class="rank-icon">' + rank.icon + '</div>' +
+        '<div class="rank-body">' +
+          '<div class="rank-label">Your collector rank</div>' +
+          '<div class="rank-title">' + escapeHtml(rank.title) + '</div>' +
+          '<div class="rank-sub">' + t.owned + ' of ' + t.colors + ' sticks collected</div>' +
+          nextHtml +
+        '</div>' +
+      '</div>';
+  }
+
+  var colEl = $("#titles-collections");
+  if (colEl) {
+    colEl.innerHTML = colourCollections().map(function (c) {
+      var owned = ownedList(c.id).length, total = (c.colors || []).length;
+      var done = total > 0 && owned >= total;
+      return '<div class="title-card ' + (done ? "unlocked" : "locked") + '">' +
+        '<span class="title-icon">' + (done ? "🥇" : "🔒") + '</span>' +
+        '<span class="title-name">' + escapeHtml(c.name) + ' Master</span>' +
+        '<span class="title-sub">' + escapeHtml(c.brand || "") + ' · ' + (done ? "unlocked!" : owned + "/" + total + " · " + Math.round(pctOf(owned, total)) + "%") + '</span>' +
+      '</div>';
+    }).join("") || '<div class="empty">No collections.</div>';
+  }
+
+  var setEl = $("#titles-sets");
+  if (setEl) {
+    var rows = [];
+    setsCollections().forEach(function (c) {
+      c.colors.forEach(function (col) {
+        var got = isOwned(c.id, col.code);
+        rows.push('<div class="title-card ' + (got ? "unlocked" : "locked") + '">' +
+          '<span class="title-icon">' + (got ? (col.icon || "🏅") : "🔒") + '</span>' +
+          '<span class="title-name">' + escapeHtml(col.title || col.name) + '</span>' +
+          '<span class="title-sub">' + escapeHtml(col.name) + (got ? " · earned!" : " · collect the set") + '</span>' +
+        '</div>');
+      });
+    });
+    setEl.innerHTML = rows.join("") || '<div class="empty">No set titles.</div>';
+  }
+
+  var funEl = $("#titles-fun");
+  if (funEl) {
+    funEl.innerHTML = funTitles().map(function (f) {
+      return '<div class="title-card ' + (f.on ? "unlocked" : "locked") + '">' +
+        '<span class="title-icon">' + (f.on ? f.icon : "🔒") + '</span>' +
+        '<span class="title-name">' + escapeHtml(f.title) + '</span>' +
+        '<span class="title-sub">' + (f.on ? "unlocked!" : escapeHtml(f.desc)) + '</span>' +
+      '</div>';
+    }).join("");
+  }
 }
 
 /* ── Stats rendering ───────────────────────────────────── */
@@ -1093,6 +1225,7 @@ function switchTab(tabId) {
   if (tabId === "sets") { renderSetsView(); }
   if (tabId === "shopping") { renderShopping(); }
   if (tabId === "stats") { renderStats(); }
+  if (tabId === "titles") { renderTitles(); }
   if (tabId === "notes") { renderNotes(); }
   if (tabId === "journal") { renderJournal(); }
 }
@@ -1106,6 +1239,7 @@ function refreshAll() {
     renderSetsView();
     renderShopping();
     renderStats();
+    renderTitles();
     renderNotes();
     renderJournal();
   });

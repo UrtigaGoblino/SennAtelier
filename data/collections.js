@@ -793,16 +793,16 @@ window.SENNELIER_COLLECTIONS = [
     name: "Special Sets",
     blurb: "Themed collector's sets of 6 half-pastels — collect them all!",
     colors: [
-      { code: "112104126", name: "Autumn Landscape", hex: "#C4652A" },
-      { code: "112104133", name: "Dark Skin Tones", hex: "#6B4226" },
-      { code: "112104127", name: "Emerald Sea", hex: "#1F7A6B" },
-      { code: "112104131", name: "Pale Skin Tones", hex: "#E8C4A8" },
-      { code: "112104134", name: "Seascape", hex: "#2E7DA6" },
-      { code: "112104130", name: "Spring Field", hex: "#7DB85A" },
-      { code: "112104128", name: "Stormy Sky", hex: "#5A6B7A" },
-      { code: "112104129", name: "Summer Sky", hex: "#4FA3D9" },
-      { code: "112104132", name: "Winter Mountains", hex: "#8FA3B0" },
-      { code: "112104169", name: "Claude Monet Set", hex: "#7FA8B8" }
+      { code: "112104126", name: "Autumn Landscape", hex: "#C4652A", title: "Autumn Wanderer", icon: "🍂" },
+      { code: "112104133", name: "Dark Skin Tones", hex: "#6B4226", title: "Portrait Master", icon: "🎨" },
+      { code: "112104127", name: "Emerald Sea", hex: "#1F7A6B", title: "Emerald Voyager", icon: "🌊" },
+      { code: "112104131", name: "Pale Skin Tones", hex: "#E8C4A8", title: "Portrait Artist", icon: "🖌️" },
+      { code: "112104134", name: "Seascape", hex: "#2E7DA6", title: "Coastal Dreamer", icon: "🏖️" },
+      { code: "112104130", name: "Spring Field", hex: "#7DB85A", title: "Meadow Wanderer", icon: "🌼" },
+      { code: "112104128", name: "Stormy Sky", hex: "#5A6B7A", title: "Storm Chaser", icon: "⛈️" },
+      { code: "112104129", name: "Summer Sky", hex: "#4FA3D9", title: "Sun Chaser", icon: "☀️" },
+      { code: "112104132", name: "Winter Mountains", hex: "#8FA3B0", title: "Alpine Explorer", icon: "🏔️" },
+      { code: "112104169", name: "Claude Monet Set", hex: "#7FA8B8", title: "Impressionist", icon: "🎨" }
     ]
   },
 
