@@ -789,6 +789,7 @@ window.SENNELIER_COLLECTIONS = [
   {
     id: "special-sets",
     brand: "Sennelier",
+    kind: "sets",
     name: "Special Sets",
     blurb: "Themed collector's sets of 6 half-pastels — collect them all!",
     colors: [

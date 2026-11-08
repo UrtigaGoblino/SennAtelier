@@ -583,7 +583,14 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 .special-head { display: flex; align-items: center; gap: 10px; }
 .special-head h3 { margin: 0; }
 
-.sets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+.sets-brand { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 18px 0 10px; }
+.sets-brand:first-child { margin-top: 2px; }
+.sets-section { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
+
+.goal-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.goal-row:last-of-type { border-bottom: 0; }
+.goal-name { font-weight: 600; font-size: 0.9rem; }
+.goal-next { font-size: 0.85rem; color: var(--accent); font-weight: 700; white-space: nowrap; }
 .set-card {
   display: flex;
   flex-direction: column;

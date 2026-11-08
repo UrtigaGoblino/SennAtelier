@@ -44,17 +44,22 @@ function getCollectionById(id) {
   return (window.SENNELIER_COLLECTIONS || []).filter(function (c) { return c.id === id; })[0] || null;
 }
 
-/* The "Special Sets" collection holds collectible sets, not individual colours,
-   so colour/stick stats and the Collection/Palette switchers skip it. */
-var SETS_ID = "special-sets";
-function isColourCollection(c) { return !!c && c.id !== SETS_ID; }
+/* Collections are either "colours" (default) or "sets" (collectible sets).
+   Colour collections feed the colour/stick stats and the Collection/Palette
+   switchers; sets get their own tab and are grouped by brand. */
+function isSetCollection(c) { return !!c && c.kind === "sets"; }
+function isColourCollection(c) { return !!c && c.kind !== "sets"; }
 function colourCollections() {
   return (window.SENNELIER_COLLECTIONS || []).filter(isColourCollection);
 }
+function setsCollections() {
+  return (window.SENNELIER_COLLECTIONS || []).filter(isSetCollection);
+}
 
 function currentCollection() {
-  var cols = window.SENNELIER_COLLECTIONS || [];
-  return getCollectionById(activeCollectionId) || cols[0] || null;
+  var c = getCollectionById(activeCollectionId);
+  if (c && isColourCollection(c)) { return c; }
+  return colourCollections()[0] || null;
 }
 
 /* ── localStorage (collection + notes) ─────────────────── */
@@ -208,11 +213,13 @@ function celebrateOnAdd(collId, count) {
     var key = collId + ":" + tier;
     if (!celebrated[key]) {
       celebrated[key] = true;
-      if (tier === 100) {
-        toast("🏆 You've collected the ENTIRE " + coll.name + " range!");
-      } else {
-        toast("🎉 You've collected " + tier + "% of " + coll.name + "!");
-      }
+      var msgs = {
+        25: "🌱 25% of " + coll.name + " — great start!",
+        50: "🌿 Halfway there! 50% of " + coll.name + "!",
+        75: "🔥 75% of " + coll.name + " — so close!",
+        100: "🏆 100%! You've completed " + coll.name + "!"
+      };
+      toast(msgs[tier] || ("🎉 " + tier + "% of " + coll.name + "!"));
     }
   }
 }
@@ -502,21 +509,44 @@ function renderPalette() {
 
 /* ── Special Sets rendering ────────────────────────────── */
 function renderSetsView() {
-  var coll = getCollectionById("special-sets");
-  var grid = $("#sets-grid");
-  if (!grid) { return; }
-  if (!coll) { grid.innerHTML = '<div class="empty">No special sets defined.</div>'; return; }
-  var owned = ownedList(coll.id).length;
-  var wish = wishlistList(coll.id).length;
-  var restock = restockList(coll.id).length;
+  var wrap = $("#sets-grid");
+  if (!wrap) { return; }
+  var sets = setsCollections();
+  var total = 0, owned = 0, wish = 0, restock = 0;
+  sets.forEach(function (c) {
+    total += (c.colors || []).length;
+    owned += ownedList(c.id).length;
+    wish += wishlistList(c.id).length;
+    restock += restockList(c.id).length;
+  });
   var countEl = $("#sets-count");
   if (countEl) {
-    countEl.textContent = owned + " of " + coll.colors.length + " collected" +
+    countEl.textContent = owned + " of " + total + " collected" +
       (wish ? " · " + wish + " wishlist" : "") +
       (restock ? " · " + restock + " restock" : "");
   }
-  grid.innerHTML = "";
-  coll.colors.forEach(function (color) { grid.appendChild(renderSetCard(coll, color)); });
+  if (!sets.length) { wrap.innerHTML = '<div class="empty">No special sets defined.</div>'; return; }
+
+  var groups = {}, order = [];
+  sets.forEach(function (c) {
+    var b = c.brand || "Other";
+    if (!groups[b]) { groups[b] = []; order.push(b); }
+    groups[b].push(c);
+  });
+
+  wrap.innerHTML = "";
+  order.forEach(function (brand) {
+    var label = document.createElement("div");
+    label.className = "sets-brand";
+    label.textContent = brand;
+    wrap.appendChild(label);
+    var grid = document.createElement("div");
+    grid.className = "sets-section";
+    groups[brand].forEach(function (coll) {
+      coll.colors.forEach(function (color) { grid.appendChild(renderSetCard(coll, color)); });
+    });
+    wrap.appendChild(grid);
+  });
 }
 
 function renderSetCard(coll, color) {
@@ -680,16 +710,19 @@ function renderHome() {
     ? '<h3>🛍️ Shopping</h3><p class="muted">You have <strong>' + shop + '</strong> item' + (shop === 1 ? "" : "s") + ' on your list.</p><button class="btn btn-primary home-shopping-btn" data-goto="shopping">Open shopping list →</button>'
     : '<h3>🛍️ Shopping</h3><p class="muted">Your shopping list is empty.</p>';
 
-  var setsColl = getCollectionById("special-sets");
-  if (setsColl && $("#home-special")) {
-    var setsOwned = ownedList("special-sets").length;
+  var setsColls = setsCollections();
+  if (setsColls.length && $("#home-special")) {
+    var setsOwned = 0, setsTotal = 0;
+    setsColls.forEach(function (c) { setsOwned += ownedList(c.id).length; setsTotal += (c.colors || []).length; });
     $("#home-special").innerHTML =
       '<div class="special-head"><h3>✨ Special Sets</h3><span class="special-badge">Collectible</span></div>' +
-      '<p class="muted">Themed sets of 6 half-pastels — <strong>' + setsOwned + ' of ' + setsColl.colors.length + '</strong> collected.</p>' +
+      '<p class="muted">Themed collector sets — <strong>' + setsOwned + ' of ' + setsTotal + '</strong> collected.</p>' +
       '<button class="btn btn-special" data-goto="sets">Open Special Sets →</button>';
     var gotoSpecial = $("#home-special").querySelector("[data-goto]");
     if (gotoSpecial) { gotoSpecial.onclick = function () { switchTab("sets"); }; }
   }
+
+  renderGoals();
 
   var goto = $("#home-shopping").querySelector("[data-goto]");
   if (goto) { goto.onclick = function () { switchTab("shopping"); }; }
@@ -699,14 +732,54 @@ function statTile(num, label) {
   return '<div class="stat-tile"><div class="num">' + num + '</div><div class="lbl">' + label + '</div></div>';
 }
 
+/* ── Visible "next goals" (milestones ahead) ───────────── */
+function nextMilestone(pct) {
+  for (var i = 0; i < MILESTONES.length; i++) {
+    if (pct < MILESTONES[i]) { return MILESTONES[i]; }
+  }
+  return null;
+}
+
+function renderGoals() {
+  var box = $("#home-goals");
+  if (!box) { return; }
+  var items = [], complete = [];
+  (window.SENNELIER_COLLECTIONS || []).forEach(function (c) {
+    var total = (c.colors || []).length;
+    if (!total) { return; }
+    var owned = ownedList(c.id).length;
+    var pct = (owned / total) * 100;
+    var nm = nextMilestone(pct);
+    if (nm === null) { complete.push(c.name); return; }
+    var need = Math.ceil((nm / 100) * total) - owned;
+    items.push({ label: (c.brand || "") + " · " + c.name, nm: nm, need: need });
+  });
+  items.sort(function (a, b) { return a.need - b.need; });
+  var html = '<h3>🎯 Next goals</h3>';
+  if (!items.length && !complete.length) {
+    html += '<p class="muted">No collections yet.</p>';
+  } else {
+    if (items.length) {
+      html += items.map(function (it) {
+        return '<div class="goal-row"><span class="goal-name">' + escapeHtml(it.label) + '</span>' +
+          '<span class="goal-next">🎯 ' + it.nm + '% <span class="muted">(' + it.need + ' more)</span></span></div>';
+      }).join("");
+    }
+    if (complete.length) {
+      html += '<p class="muted">🏆 Complete: ' + complete.map(escapeHtml).join(", ") + '</p>';
+    }
+  }
+  box.innerHTML = html;
+}
+
 /* ── Stats rendering ───────────────────────────────────── */
 function renderStats() {
   var t = totalCounts();
   var overallPct = t.colors ? Math.round((t.owned / t.colors) * 100) : 0;
 
-  var setsColl = getCollectionById(SETS_ID);
-  var setsOwned = ownedList(SETS_ID).length;
-  var setsTotal = setsColl ? (setsColl.colors || []).length : 0;
+  var setsColls = setsCollections();
+  var setsOwned = 0, setsTotal = 0;
+  setsColls.forEach(function (c) { setsOwned += ownedList(c.id).length; setsTotal += (c.colors || []).length; });
 
   $("#stats-overview").innerHTML =
     '<div class="stats-overview">' +
