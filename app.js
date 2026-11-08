@@ -187,6 +187,7 @@ function isRestocked(collId, code) { return restockList(collId).indexOf(code) !=
 function setOwnedState(collId, code, owned) {
   var list = ownedList(collId);
   var idx = list.indexOf(code);
+  var before = (owned && idx === -1) ? titleSnapshot() : null;
   if (owned && idx === -1) {
     list.push(code);
     state.owned[collId] = list;
@@ -196,24 +197,29 @@ function setOwnedState(collId, code, owned) {
     state.owned[collId] = list;
   }
   saveState();
+  if (before) { celebrateNewTitles(before); }
 }
 
 function setWishlistState(collId, code, on) {
   var list = wishlistList(collId);
   var idx = list.indexOf(code);
+  var before = (on && idx === -1) ? titleSnapshot() : null;
   if (on && idx === -1) { list.push(code); }
   else if (!on && idx !== -1) { list.splice(idx, 1); }
   state.wishlist[collId] = list;
   saveState();
+  if (before) { celebrateNewTitles(before); }
 }
 
 function setRestockState(collId, code, on) {
   var list = restockList(collId);
   var idx = list.indexOf(code);
+  var before = (on && idx === -1) ? titleSnapshot() : null;
   if (on && idx === -1) { list.push(code); }
   else if (!on && idx !== -1) { list.splice(idx, 1); }
   state.restock[collId] = list;
   saveState();
+  if (before) { celebrateNewTitles(before); }
 }
 
 function toggleOwned(collId, code) { setOwnedState(collId, code, !isOwned(collId, code)); }
@@ -258,6 +264,102 @@ function toast(msg) {
     t.classList.add("out");
     setTimeout(function () { t.remove(); }, 400);
   }, 3200);
+}
+
+/* ── Confetti + title unlocks ──────────────────────────── */
+var confettiParticles = [];
+var confettiRaf = null;
+
+function confetti() {
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
+  var canvas = document.getElementById("confetti-canvas");
+  if (!canvas || !canvas.getContext) { return; }
+  var dpr = window.devicePixelRatio || 1;
+  var w = window.innerWidth, h = window.innerHeight;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + "px"; canvas.style.height = h + "px";
+  var colors = ["#e8a0bf", "#c14b3c", "#f6d365", "#8fb98a", "#6fa3d3", "#b98ad3", "#fda085", "#ffd97a"];
+  var ox = w / 2, oy = h * 0.4;
+  for (var i = 0; i < 90; i++) {
+    var ang = Math.random() * Math.PI * 2;
+    var sp = 4 + Math.random() * 9;
+    confettiParticles.push({
+      x: ox, y: oy,
+      vx: Math.cos(ang) * sp,
+      vy: Math.sin(ang) * sp - 7,
+      size: 4 + Math.random() * 7,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI,
+      vrot: (Math.random() - 0.5) * 0.35,
+      life: 0,
+      maxLife: 80 + Math.random() * 50,
+      rect: Math.random() < 0.55
+    });
+  }
+  if (!confettiRaf) { confettiRaf = requestAnimationFrame(confettiTick); }
+}
+
+function confettiTick() {
+  var canvas = document.getElementById("confetti-canvas");
+  if (!canvas) { confettiRaf = null; confettiParticles = []; return; }
+  var ctx = canvas.getContext("2d");
+  var dpr = window.devicePixelRatio || 1;
+  var w = window.innerWidth, h = window.innerHeight;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  var keep = [];
+  for (var i = 0; i < confettiParticles.length; i++) {
+    var p = confettiParticles[i];
+    p.life++;
+    if (p.life >= p.maxLife) { continue; }
+    p.vy += 0.16;
+    p.vx *= 0.992;
+    p.vy *= 0.995;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vrot;
+    var alpha = Math.max(0, 1 - p.life / p.maxLife);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    if (p.rect) { ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2); }
+    else { ctx.beginPath(); ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+    keep.push(p);
+  }
+  confettiParticles = keep;
+  if (keep.length) { confettiRaf = requestAnimationFrame(confettiTick); }
+  else { confettiRaf = null; ctx.clearRect(0, 0, w, h); }
+}
+
+/* Snapshot every unlocked title so we can detect newly-earned ones */
+function titleSnapshot() {
+  var out = {};
+  var t = totalCounts();
+  RANKS.forEach(function (r) { if (t.owned >= r.min) { out["rank:" + r.title] = r.icon + " " + r.title; } });
+  colourCollections().forEach(function (c) {
+    var total = (c.colors || []).length;
+    if (total && ownedList(c.id).length >= total) { out["master:" + c.id] = "🥇 " + c.name + " Master"; }
+  });
+  setsCollections().forEach(function (c) {
+    c.colors.forEach(function (col) {
+      if (isOwned(c.id, col.code) && col.title) { out["set:" + c.id + ":" + col.code] = (col.icon || "🎖️") + " " + col.title; }
+    });
+  });
+  funTitles().forEach(function (f) { if (f.on) { out["fun:" + f.title] = f.icon + " " + f.title; } });
+  return out;
+}
+
+function celebrateNewTitles(before) {
+  var after = titleSnapshot();
+  var newly = [];
+  Object.keys(after).forEach(function (k) { if (!before[k]) { newly.push(after[k]); } });
+  if (!newly.length) { return; }
+  confetti();
+  if (newly.length === 1) { toast("🏅 Title unlocked: " + newly[0]); }
+  else { toast("🏅 " + newly.length + " titles unlocked: " + newly.slice(0, 2).join(", ") + (newly.length > 2 ? "…" : "")); }
 }
 
 /* ── Colour helpers (hex -> HSL -> family, hue sort) ───── */
@@ -980,6 +1082,7 @@ function saveNoteFromComposer() {
   var input = $("#note-input");
   var text = input.value.trim();
   if (!text) { return; }
+  var before = titleSnapshot();
   var now = Date.now();
   if (editingNoteId) {
     var n = state.notes.filter(function (x) { return x.id === editingNoteId; })[0];
@@ -992,6 +1095,7 @@ function saveNoteFromComposer() {
   input.value = "";
   saveState();
   renderNotes();
+  celebrateNewTitles(before);
 }
 
 function beginEditNote(n) {
@@ -1097,6 +1201,7 @@ function handleJournalFile(file) {
 }
 
 function saveJournalEntry() {
+  var before = titleSnapshot();
   var title = $("#j-title").value.trim() || "Untitled";
   var date = $("#j-date").value;
   var note = $("#j-note").value.trim();
@@ -1115,7 +1220,10 @@ function saveJournalEntry() {
   idbPut(entry).then(function () {
     closeJournalForm();
     return loadJournal();
-  }).then(renderJournal).catch(function () {
+  }).then(function () {
+    renderJournal();
+    celebrateNewTitles(before);
+  }).catch(function () {
     alert("Could not save the entry.");
   });
 }

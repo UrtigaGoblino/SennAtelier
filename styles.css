@@ -650,6 +650,8 @@ code { background: var(--bg-soft); padding: 1px 5px; border-radius: 4px; font-si
 .set-title { margin-top: 2px; font-size: 0.8rem; font-weight: 700; color: #b8860b; }
 .goal-ico { font-size: 1rem; }
 
+#confetti-canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 150; }
+
 /* ── Responsive ─────────────────────────────────────────── */
 @media (max-width: 640px) {
   .home-grid { grid-template-columns: 1fr; }
