@@ -4,6 +4,8 @@ A small, private web app for keeping track of a personal **art supply collection
 
 Everything runs in the browser. **Your data never leaves your device** — it's stored only in *your* browser (on *your* computer or phone), and nothing is uploaded anywhere.
 
+**🔗 Live app:** https://urtigagoblino.github.io/SennAtelier/
+
 ---
 
 ## ✨ What it does
