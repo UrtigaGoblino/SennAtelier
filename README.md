@@ -74,12 +74,12 @@ You only need to edit **one file**: `data/collections.js`.
 
 Then save and re-deploy (see below). No other file needs to change.
 
-> The data file currently holds **7 collections across 2 brands — 848 items**:
+> The data file currently holds **8 collections across 2 brands — 1,048 items**:
 >
 > - **Sennelier** — Oil Pastels (120), Oil Pastels Iridescent (10), Extra-Fine Oil Sticks (64), Soft Pastels "à l'écu" (499), Iridescent Soft Pastels (25), Special Sets (10 themed collector sets)
-> - **Artist Gallery** — Oil Pastels (120)
+> - **Artist Gallery** — Oil Pastels (120), Extra Fine Soft Pastels (200, MPA Gallery Series)
 >
-> Colour names/numbers come from official charts and retailer listings; on-screen swatch colours come from retailer swatches (pontodasartes.com), so they're genuinely accurate.
+> Colour names/numbers come from official charts and retailer listings; on-screen swatch colours come from retailer swatches (pontodasartes.com) or hand-picked values, so they're genuinely accurate.
 
 ---
 
