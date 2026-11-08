@@ -1,6 +1,6 @@
 # 🎨 Art Studio
 
-A small, private web app for keeping track of a personal **art supply collection** — across brands (Sennelier, Artist Gallery, and more to come) — plus notes and a little **art journal** of the pieces you make.
+A small, private web app for keeping track of a personal **art supply collection** — across brands (Sennelier, Artist Gallery, and more to come) — with **titles, ranks, goals and confetti** to make collecting fun, plus notes and a little **art journal** of the pieces you make.
 
 Everything runs in the browser. **Your data never leaves your device** — it's stored only in *your* browser (on *your* computer or phone), and nothing is uploaded anywhere.
 
@@ -10,14 +10,29 @@ Everything runs in the browser. **Your data never leaves your device** — it's 
 
 | Tab | What it's for |
 | --- | --- |
-| 🏠 **Home** | Your dashboard — progress rings, stick counter, and a quick glance at each collection. |
-| 🎨 **Collection** | Every range as a grid of colours, **grouped by brand**. **Tap a colour** to mark it *owned* (✓). Tap **☆** for your *wishlist*, and **🔁** to flag something for *restock*. Search and filter to find things fast. |
+| 🏠 **Home** | Your dashboard — progress ring, **collector rank**, stick counter, a **🎯 Goals** card, and a quick glance at each collection. |
+| 🎨 **Collection** | Every range as a grid of colours, **grouped by brand** (Sennelier, Artist Gallery…). **Tap a colour** to mark it *owned* (✓). Tap **☆** for your *wishlist*, and **🔁** to flag something for *restock*. Search and filter to find things fast. |
 | 🌈 **Palette** | Your *owned* colours laid out in rainbow order — like opening your actual pastel box. |
+| ✨ **Sets** | The limited themed collector sets, grouped by brand. Collect a set to earn its **title**. |
 | 🛍️ **Shopping** | Your wishlist + restock list in one place, ready for the art shop. |
-| 📊 **Stats** | Totals, per-collection progress, and your favourite colour families. |
+| 📊 **Stats** | Totals, progress per collection, and your favourite colour families. |
+| 🏅 **Titles** | Achievements you've earned — **collector ranks**, **collection masters**, **set titles** and **fun titles**. |
 | 📓 **Notes** | A simple notebook. Write wishlist ideas, techniques, colour-mixing notes — anything. |
 | 🖼️ **Art Journal** | Add a **photo** of your art, plus a **title**, **date**, and an optional **note**. |
 | 📖 **Help** | Quick in-app instructions. |
+
+---
+
+## 🏅 Titles, ranks & goals (the fun part!)
+
+Collecting unlocks **titles** — and a **confetti burst** 🎊 fires when you earn a new one.
+
+- **Collector ranks** — level up as you own more colours: 🌱 Curious Beginner → 🖌️ First Brushstroke → 🎨 Colour Collector → 🌈 Palette Explorer → 💎 Hue Hero → 🏆 Colour Maestro → 👑 Legend of Colour.
+- **Collection Masters** — complete a whole range (100%) to earn its Master title.
+- **Set Titles** — each limited themed set grants its own title when collected (e.g. 🍂 Autumn Wanderer, ⛈️ Storm Chaser, 🎨 Impressionist).
+- **Fun titles** — extras like 🎁 Set Collector, ✨ Iridescent Dreamer, 🌈 Rainbow Rider, 📝 Note Taker, 🖼️ Art Journalist.
+
+The **Home** tab shows your current rank and a **"Goals" card** with the closest rewards to chase. See everything on the **🏅 Titles** tab.
 
 ---
 
@@ -70,7 +85,8 @@ You only need to edit **one file**: `data/collections.js`.
 4. Each colour is `{ "code": "001", "name": "White", "hex": "#f6f5f1" }`:
    - `code` — the colour's official number (as text, e.g. `"001"`).
    - `name` — the colour name.
-   - `hex` — an approximate on-screen swatch colour (refine against the real sticks).
+   - `hex` — the on-screen swatch colour.
+5. *(Optional)* To add a **collectible set** instead of colours, add `kind: "sets"` to the collection entry. Each set can also carry a `title` and `icon` (e.g. `"title": "Autumn Wanderer", "icon": "🍂"`) — collecting it then earns that title.
 
 Then save and re-deploy (see below). No other file needs to change.
 
